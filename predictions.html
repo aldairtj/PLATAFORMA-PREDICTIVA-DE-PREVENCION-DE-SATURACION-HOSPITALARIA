@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicciones - Dashboard Hospitalario</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <a href="index.html"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item active"> <i class="fas fa-chart-line"></i>
+                        <a href="predictions.html"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cogs"></i>
+                        <a href="gestion_operativa.html"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="acerca_de.html"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="date-info">
+                    Viernes, 14 de Noviembre de 2025
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">Hospital Central</span>
+                    <i class="fas fa-user-circle"></i> </div>
+            </header>
+
+            <section class="dashboard-body">
+                <h1 class="section-title">Predicción de Saturación Hospitalaria (Modelo ML)</h1>
+                <p class="subtitle">Análisis predictivo basado en inteligencia artificial y aprendizaje automático</p>
+
+                <div class="prediction-summary-cards">
+                    <div class="card prediction-card">
+                        <i class="fas fa-chart-area icon-gradient"></i>
+                        <div class="card-content">
+                            <div class="card-label">Predicción del modelo</div>
+                            <div class="card-value">94.2%</div>
+                        </div>
+                    </div>
+                    <div class="card prediction-card">
+                        <i class="fas fa-arrow-up icon-gradient"></i>
+                        <div class="card-content">
+                            <div class="card-label">Tendencia general</div>
+                            <div class="card-value"><span>↑</span> Aumento</div>
+                        </div>
+                    </div>
+                    <div class="card prediction-card alert-status-card">
+                        <i class="fas fa-hospital icon-red"></i>
+                        <div class="card-content">
+                            <div class="card-label">Hospitales en riesgo</div>
+                            <div class="card-value">2 de 4</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-box chart-prediction-uci">
+                    <h3>Predicción de Ocupación UCI - Próximas 48 Horas</h3>
+                    <canvas id="uciPredictionChart"></canvas>
+                    <div class="legend-prediction-uci">
+                        <span class="dot actual-dot"></span> Ocupación Actual
+                        <span class="dot prediction-dot"></span> Predicción IA
+                    </div>
+                </div>
+
+                <h2 class="section-sub-title">Predicciones por Hospital</h2>
+                <div class="hospital-prediction-grid">
+                    <div class="hospital-card saturated">
+                        <h4>Hospital Central</h4>
+                        <div class="status-label">Saturado</div>
+                        <p>Ocupación actual: 85%</p>
+                        <p>Predicción 24h: <span class="value-highlight">98%</span></p>
+                        <p>Predicción 48h: <span class="value-highlight">95%</span></p>
+                        <p>Nivel de riesgo: <span class="risk-level critical">Crítico</span></p>
+                        <button class="btn-details">Ver detalles</button>
+                    </div>
+
+                    <div class="hospital-card alert">
+                        <h4>Hospital Norte</h4>
+                        <div class="status-label">Alerta</div>
+                        <p>Ocupación actual: 72%</p>
+                        <p>Predicción 24h: <span class="value-highlight">78%</span></p>
+                        <p>Predicción 48h: <span class="value-highlight">75%</span></p>
+                        <p>Nivel de riesgo: <span class="risk-level moderate">Moderado</span></p>
+                        <button class="btn-details">Ver detalles</button>
+                    </div>
+
+                    <div class="hospital-card normal">
+                        <h4>Hospital Sur</h4>
+                        <div class="status-label">Normal</div>
+                        <p>Ocupación actual: 58%</p>
+                        <p>Predicción 24h: <span class="value-highlight">62%</span></p>
+                        <p>Predicción 48h: <span class="value-highlight">64%</span></p>
+                        <p>Nivel de riesgo: <span class="risk-level low">Bajo</span></p>
+                        <button class="btn-details">Ver detalles</button>
+                    </div>
+
+                    <div class="hospital-card saturated">
+                        <h4>Hospital Este</h4>
+                        <div class="status-label">Saturado</div>
+                        <p>Ocupación actual: 91%</p>
+                        <p>Predicción 24h: <span class="value-highlight">96%</span></p>
+                        <p>Predicción 48h: <span class="value-highlight">98%</span></p>
+                        <p>Nivel de riesgo: <span class="risk-level critical">Crítico</span></p>
+                        <button class="btn-details">Ver detalles</button>
+                    </div>
+                </div>
+
+                <h2 class="section-sub-title">Comparativa: Ocupación Actual vs Predicción 24h</h2>
+                <div class="chart-box chart-comparative">
+                    <canvas id="comparativeChart"></canvas>
+                    <div class="legend-comparative">
+                        <span class="dot actual-bar-dot"></span> Actual %
+                        <span class="dot prediction-bar-dot"></span> Predicción 24h %
+                    </div>
+                </div>
+
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

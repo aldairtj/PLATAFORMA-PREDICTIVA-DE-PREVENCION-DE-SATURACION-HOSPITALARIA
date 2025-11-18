@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión Operativa - Dashboard Hospitalario</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    </head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <a href="index.html"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <a href="predictions.html"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item active"> 
+                        <i class="fas fa-cogs"></i>
+                        <a href="gestion_operativa.html"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="acerca_de.html"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="date-info">
+                    Viernes, 14 de Noviembre de 2025
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">Hospital Central</span>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="dashboard-body">
+                <h1 class="section-title">Gestión Operativa</h1>
+                <p class="subtitle">Herramientas para la toma de decisiones preventivas y redistribución de recursos</p>
+
+                <div class="action-cards-grid">
+                    
+                    <div class="action-card">
+                        <i class="fas fa-bed icon-blue-light"></i>
+                        <h3>Reasignar Camas</h3>
+                        <p>Redistribuye camas disponibles entre hospitales según demanda</p>
+                        <button class="btn-action">Iniciar solicitud</button>
+                    </div>
+
+                    <div class="action-card">
+                        <i class="fas fa-user-plus icon-purple"></i>
+                        <h3>Trasladar Pacientes</h3>
+                        <p>Coordina el traslado de pacientes a centros con menor ocupación</p>
+                        <button class="btn-action">Iniciar solicitud</button>
+                    </div>
+
+                    <div class="action-card">
+                        <i class="fas fa-box icon-green-light"></i>
+                        <h3>Solicitar Recursos</h3>
+                        <p>Gestiona pedidos urgentes de insumos médicos y equipamiento</p>
+                        <button class="btn-action">Iniciar solicitud</button>
+                    </div>
+                </div>
+
+                <div class="recent-actions-section">
+                    <h2 class="section-sub-title">Acciones Recientes</h2>
+                    <ul class="actions-list">
+                        <li class="action-item">
+                            <i class="far fa-circle action-icon"></i>
+                            <span class="action-text">Reasignación de camas: Hospital Central → Hospital Sur</span>
+                            <span class="status completed">Completado</span>
+                            <span class="action-details">15 camas UCI · Hace 2 horas</span>
+                        </li>
+                        <li class="action-item">
+                            <i class="far fa-circle action-icon"></i>
+                            <span class="action-text">Solicitud: Hospital Este</span>
+                            <span class="status in-progress">En proceso</span>
+                            <span class="action-details">20 ventiladores · Hace 4 horas</span>
+                        </li>
+                        <li class="action-item">
+                            <i class="far fa-circle action-icon"></i>
+                            <span class="action-text">Traslado de pacientes: Hospital Norte → Hospital Oeste</span>
+                            <span class="status completed">Completado</span>
+                            <span class="action-details">8 pacientes · Hace 6 horas</span>
+                        </li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
