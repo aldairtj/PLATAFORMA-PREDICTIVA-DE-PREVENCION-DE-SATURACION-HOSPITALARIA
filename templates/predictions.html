@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Predicciones - Dashboard Hospitalario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <a href="{{ url_for('dashboard') }}"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <i class="fas fa-chart-line"></i>
+                        <a href="{{ url_for('predictions') }}"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                    <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cogs"></i>
+                        <a href="{{ url_for('gestion_operativa') }}"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="{{ url_for('acerca_de') }}"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="date-info">
+                    {{ fecha_actual }}
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">{{ hospital_nombre }}</span>
+                    <a href="{{ url_for('logout') }}" style="margin-left: 15px; color: #666;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="dashboard-body">
+                <h1 class="section-title">Predicción de Saturación Hospitalaria (Modelo ML) - {{ hospital_nombre }}</h1>
+                <p class="subtitle">Análisis predictivo basado en inteligencia artificial y aprendizaje automático</p>
+                
+                <div class="prediction-summary-cards">
+                    <div class="card prediction-card">
+                        <i class="fas fa-chart-area icon-gradient"></i>
+                        <div class="card-content">
+                            <div class="card-label">Predicción del modelo</div>
+                            <div class="card-value">{{ predicciones.prediccion_modelo }}%</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card prediction-card">
+                        <i class="fas fa-arrow-up icon-gradient"></i>
+                        <div class="card-content">
+                            <div class="card-label">Tendencia general</div>
+                            <div class="card-value"><span>↑</span> {{ predicciones.tendencia }}</div>
+                        </div>
+                    </div>
+                    
+                    <div class="card prediction-card alert-status-card">
+                        <i class="fas fa-hospital icon-red"></i>
+                        <div class="card-content">
+                            <div class="card-label">Hospitales en riesgo</div>
+                            <div class="card-value">{{ predicciones.hospitales_riesgo }} de 5</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="chart-box chart-prediction-uci">
+                    <h3>Predicción de Ocupación UCI - Próximas 48 Horas - {{ hospital_nombre }}</h3>
+                    <canvas id="uciPredictionChart"></canvas>
+                    <div class="legend-prediction-uci">
+                        <span class="dot actual-dot"></span> Ocupación Actual
+                        <span class="dot prediction-dot"></span> Predicción IA
+                    </div>
+                </div>
+
+                <h2 class="section-sub-title">Predicciones Detalladas - {{ hospital_nombre }}</h2>
+                <div class="hospital-prediction-grid">
+                    <div class="hospital-card saturated">
+                        <h4>{{ hospital_nombre }}</h4>
+                        <div class="status-label">
+                            {% if predicciones.nivel_riesgo == 'Crítico' %}Saturado
+                            {% elif predicciones.nivel_riesgo == 'Moderado' %}Alerta
+                            {% else %}Normal{% endif %}
+                        </div>
+                        <p>Ocupación actual: {{ predicciones.ocupacion_actual }}%</p>
+                        <p>Predicción 24h: <span class="value-highlight">{{ predicciones.prediccion_24h }}%</span></p>
+                        <p>Predicción 48h: <span class="value-highlight">{{ predicciones.prediccion_48h }}%</span></p>
+                        <p>Nivel de riesgo: <span class="risk-level 
+                            {% if predicciones.nivel_riesgo == 'Crítico' %}critical
+                            {% elif predicciones.nivel_riesgo == 'Moderado' %}moderate
+                            {% else %}low{% endif %}">
+                            {{ predicciones.nivel_riesgo }}
+                        </span></p>
+                        <button class="btn-details">Ver detalles</button>
+                    </div>
+                </div>
+
+                <h2 class="section-sub-title">Comparativa con Otros Hospitales</h2>
+                <div class="hospital-prediction-grid">
+                    {% for hospital in otros_hospitales %}
+                    <div class="hospital-card 
+                        {% if hospital.nivel_riesgo == 'Alto' %}saturated
+                        {% elif hospital.nivel_riesgo == 'Moderado' %}alert
+                        {% else %}normal{% endif %}">
+                        <h4>{{ hospital.nombre }}</h4>
+                        <div class="status-label">
+                            {% if hospital.nivel_riesgo == 'Alto' %}Saturado
+                            {% elif hospital.nivel_riesgo == 'Moderado' %}Alerta
+                            {% else %}Normal{% endif %}
+                        </div>
+                        <p>Predicción 24h: <span class="value-highlight">{{ hospital.prediccion_24h }}%</span></p>
+                        <p>Nivel de riesgo: <span class="risk-level 
+                            {% if hospital.nivel_riesgo == 'Alto' %}critical
+                            {% elif hospital.nivel_riesgo == 'Moderado' %}moderate
+                            {% else %}low{% endif %}">
+                            {{ hospital.nivel_riesgo }}
+                        </span></p>
+                        <button class="btn-details">Ver detalles</button>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <h2 class="section-sub-title">Comparativa: Ocupación Actual vs Predicción 24h</h2>
+                <div class="chart-box chart-comparative">
+                    <canvas id="comparativeChart"></canvas>
+                    <div class="legend-comparative">
+                        <span class="dot actual-bar-dot"></span> Actual %
+                        <span class="dot prediction-bar-dot"></span> Predicción 24h %
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gráfica de Predicción UCI
+            const uciPredictionData = {
+                labels: {{ datos_grafica_prediccion.labels | tojson }},
+                datasets: [
+                    {
+                        label: 'Ocupación Actual',
+                        data: {{ datos_grafica_prediccion.actual | tojson }},
+                        borderColor: '#1e88e5',
+                        backgroundColor: 'rgba(30, 136, 229, 0.1)',
+                        tension: 0.4,
+                        fill: false,
+                        pointBackgroundColor: '#1e88e5',
+                        pointBorderColor: '#fff',
+                        pointRadius: 5,
+                        spanGaps: true
+                    },
+                    {
+                        label: 'Predicción IA',
+                        data: {{ datos_grafica_prediccion.prediccion | tojson }},
+                        borderColor: '#ffc107',
+                        backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                        borderDash: [5, 5],
+                        tension: 0.4,
+                        fill: false,
+                        pointBackgroundColor: '#ffc107',
+                        pointBorderColor: '#fff',
+                        pointRadius: 5,
+                        spanGaps: true
+                    }
+                ]
+            };
+
+            // Gráfica Comparativa
+            const comparativeData = {
+                labels: {{ datos_comparativa.labels | tojson }},
+                datasets: [
+                    {
+                        label: 'Actual %',
+                        data: {{ datos_comparativa.actual | tojson }},
+                        backgroundColor: '#28a745',
+                        borderColor: '#28a745',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Predicción 24h %',
+                        data: {{ datos_comparativa.prediccion_24h | tojson }},
+                        backgroundColor: '#1e88e5',
+                        borderColor: '#1e88e5',
+                        borderWidth: 1
+                    }
+                ]
+            };
+
+            // Gráfica de Predicción UCI
+            const uciPredictionChartElement = document.getElementById('uciPredictionChart');
+            if (uciPredictionChartElement) {
+                new Chart(uciPredictionChartElement, {
+                    type: 'line',
+                    data: uciPredictionData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: false, max: 100, min: 0, ticks: { stepSize: 25 } },
+                            x: { grid: { display: true } }
+                        },
+                        plugins: { legend: { display: false }, title: { display: false } }
+                    }
+                });
+            }
+
+            // Gráfica Comparativa
+            const comparativeChartElement = document.getElementById('comparativeChart');
+            if (comparativeChartElement) {
+                new Chart(comparativeChartElement, {
+                    type: 'bar',
+                    data: comparativeData,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 25 } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false }, title: { display: false } }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

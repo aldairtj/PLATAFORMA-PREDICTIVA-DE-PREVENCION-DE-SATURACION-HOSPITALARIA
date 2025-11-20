@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Capacidad Hospitalaria</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item active">
+                        <i class="fas fa-home"></i>
+                        <a href="{{ url_for('dashboard') }}"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <a href="{{ url_for('predictions') }}"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cogs"></i>
+                        <a href="{{ url_for('gestion_operativa') }}"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="{{ url_for('acerca_de') }}"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="date-info">
+                    {{ fecha_actual }}
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">{{ hospital_nombre }}</span>
+                    <a href="{{ url_for('logout') }}" style="margin-left: 15px; color: #666;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="dashboard-body">
+                <h1 class="section-title">Resumen General de la Capacidad Hospitalaria Actual</h1>
+                <p class="subtitle">Panel de control y monitoreo en tiempo real - {{ hospital_nombre }}</p>
+                
+                <div class="summary-cards">
+                    <div class="card alert card-uci">
+                        <div class="card-icon"><i class="fas fa-wave-square"></i></div>
+                        <div class="card-value">{{ metricas.ocupacion_uci }}%</div>
+                        <div class="card-label">Ocupación UCI</div>
+                        <div class="card-status">Capacidad actual</div>
+                        <span class="status-label">
+                            {% if metricas.ocupacion_uci >= 80 %}Alto{% elif metricas.ocupacion_uci >= 60 %}Medio{% else %}Bajo{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="card normal card-urgencias">
+                        <div class="card-icon"><i class="fas fa-procedures"></i></div>
+                        <div class="card-value">{{ metricas.pacientes_urgencias }}</div>
+                        <div class="card-label">Pacientes en Urgencias</div>
+                        <div class="card-status">En atención</div>
+                        <span class="status-label">
+                            {% if metricas.pacientes_urgencias >= 100 %}Alto{% elif metricas.pacientes_urgencias >= 50 %}Medio{% else %}Bajo{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="card alert card-insumos">
+                        <div class="card-icon"><i class="fas fa-syringe"></i></div>
+                        <div class="card-value">{{ metricas.insumos_criticos }}%</div>
+                        <div class="card-label">Insumos Críticos</div>
+                        <div class="card-status">Ventiladores y oxígeno</div>
+                        <span class="status-label">
+                            {% if metricas.insumos_criticos >= 80 %}Alto{% elif metricas.insumos_criticos >= 60 %}Medio{% else %}Bajo{% endif %}
+                        </span>
+                    </div>
+                    
+                    <div class="card saturated card-prediccion">
+                        <div class="card-icon"><i class="fas fa-exclamation-triangle"></i></div>
+                        <div class="card-value">{{ metricas.prediccion_24h }}%</div>
+                        <div class="card-label">Predicción 24h</div>
+                        <div class="card-status">Riesgo de saturación</div>
+                        <span class="status-label">
+                            {% if metricas.prediccion_24h >= 80 %}Alto{% elif metricas.prediccion_24h >= 60 %}Medio{% else %}Bajo{% endif %}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="chart-section-wrapper">
+                    <div class="chart-box chart-evolution">
+                        <h3>Evolución de Ocupación UCI - Última Semana - {{ hospital_nombre }}</h3>
+                        <canvas id="uciEvolutionChart"></canvas>
+                        <div class="x-axis-labels">Lun Mar Mié Jue Vie</div>
+                        <div class="legend"><span class="dot uci-dot"></span> Ocupación %</div>
+                    </div>
+                    
+                    <div class="chart-box chart-hospital-occupancy">
+                        <h3>Ocupación por Área - Actual</h3>
+                        <canvas id="hospitalOccupancyChart"></canvas>
+                        <div class="legend-bar-chart">
+                            <span class="dot central-dot"></span> UCI
+                            <span class="dot este-dot"></span> Urgencias
+                            <span class="dot norte-dot"></span> Hospitalización
+                        </div>
+                    </div>
+                </div>
+
+                <div class="alerts-section">
+                    <h2 class="alerts-title">Alertas Recientes - {{ hospital_nombre }}</h2>
+                    <ul class="alerts-list">
+                        {% for alerta in alertas %}
+                        <li class="alert-item {{ 'critical' if alerta.nivel_urgencia == 'ALTO' else 'warning' }}">
+                            <i class="fas fa-exclamation-triangle"></i>
+                            <span class="alert-text">{{ alerta.mensaje }}</span>
+                            <span class="alert-time">{{ alerta.tiempo }}</span>
+                            <span class="alert-type">{{ alerta.nivel_urgencia }}</span>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const uciDataDashboard = {
+                labels: ["Lun", "Mar", "Mié", "Jue", "Vie"],
+                datasets: [{
+                    label: 'Ocupación %',
+                    data: {{ metricas.evolucion_semanal | tojson }},
+                    borderColor: '#1e88e5',
+                    backgroundColor: 'rgba(30, 136, 229, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointBackgroundColor: '#1e88e5',
+                    pointBorderColor: '#fff',
+                    pointRadius: 5
+                }]
+            };
+
+            const hospitalDataDashboard = {
+                labels: ["UCI", "Urgencias", "Hospitalización"],
+                datasets: [{
+                    label: 'Ocupación %',
+                    data: {{ metricas.ocupacion_areas | tojson }},
+                    backgroundColor: ["#3f51b5", "#ffc107", "#4caf50"],
+                    borderColor: ["#3f51b5", "#ffc107", "#4caf50"],
+                    borderWidth: 1,
+                    barPercentage: 0.7,
+                    categoryPercentage: 0.8
+                }]
+            };
+
+            const uciChartElementDashboard = document.getElementById('uciEvolutionChart');
+            if (uciChartElementDashboard) {
+                new Chart(uciChartElementDashboard, {
+                    type: 'line',
+                    data: uciDataDashboard,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: { beginAtZero: false, max: 100, min: 0, ticks: { stepSize: 25 } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false }, title: { display: false } }
+                    }
+                });
+            }
+
+            const hospitalChartElementDashboard = document.getElementById('hospitalOccupancyChart');
+            if (hospitalChartElementDashboard) {
+                new Chart(hospitalChartElementDashboard, {
+                    type: 'bar',
+                    data: hospitalDataDashboard,
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        indexAxis: 'x',
+                        scales: {
+                            y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 25 } },
+                            x: { grid: { display: false } }
+                        },
+                        plugins: { legend: { display: false }, title: { display: false } }
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

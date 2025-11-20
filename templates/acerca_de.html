@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Acerca de - Dashboard Hospitalario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <a href="{{ url_for('dashboard') }}"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <a href="{{ url_for('predictions') }}"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cogs"></i>
+                        <a href="{{ url_for('gestion_operativa') }}"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="{{ url_for('acerca_de') }}"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="date-info">
+                    {{ fecha_actual }}
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">{{ hospital_nombre }}</span>
+                    <a href="{{ url_for('logout') }}" style="margin-left: 15px; color: #666;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="dashboard-body about-page">
+                <div class="about-hero">
+                    <img src="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDgiIGhlaWdodD0iMTA4IiB2aWV3Qm94PSIwIDAgMTA4IDEwOCIgZmlsbD0ibm9uZSI+CiAgPHBhdGggZD0iTTUwLjQ1NDUgMTYuNTQ1NVY1LjgyNDU5QzUwLjQ1NDUgNC45MjM3IDUwLjcyOTMgNC4wNTg4MiA1MS4yMzYgMy4zMDQ3N0M1MS43NDI2IDIuNTUwNzEgNTIuNDYzNCAyLjAxNjkgNTMuMzA1NiAxLjgyNjQzQzUzLjk0NzggMS42MzU5NyA1NC42MjU4IDEuNjA5NzcgNTUuMzA1NiAxLjYwOTc3QzU1Ljk4NTQgMS42MDk3NyA1Ni42NjM0IDEuNjM1OTcgNTcuMzA1NiAxLjgyNjQzQzU3Ljk0NzggMi4wMTY5IDU4LjYxODcgMi41NTA3MSA1OS4xMjUzIDMuMzA0NzdDNTkuNjMyIDQuMDU4ODIgNTkuOTA2OCA0LjkyMzcgNTkuOTA2OCA1Ljg0NjI2VjE2LjU2NzFMNzEuODQ0MSA3Ljc5MDMyQzcxLjg2MTMgNy42MzYyIDcyLjAzMTkgNy40OTUyNyA3Mi4xNzcxIDcuNDA3NzZDNzIuMzIyNCA3LjMxMDI1IDcyLjQ2MDQgNy4yNDI2MiA3Mi42MTk3IDcuMTk5MzRMNzcuNzc2MiA1LjQwNTUyTDc4LjA0NTcgNC41OTAzQzgwLjQxOTggMy4wMzcxMiA4Mi44MTkyIDQuOTUyMTkgODIuODE5MiA4LjA4MTQ4VjEwLjA2NzlDNzkuNDc5NiA3LjIxMjIyIDc1Ljg5MzIgNC45NTIxOSA3Mi4wODExIDQuOTUyMTlDNjguNDI4MSA0Ljk1MjE5IDY0Ljk2NDkgNy40MjU2IDY0LjczMTcgMTAuNTY3OUM2NC40OTg0IDEzLjcxMDEgNjcuNjYxMiAxNi41NjcxIDcxLjgxOTggMTYuNTY3MUg4NC43MDk0Qzg2LjExNjUgMTYuNTY3MSA4Ny41NzA3IDE1Ljg4MDggODguMjc1MSAxNC45NDAzQzg4Ljk3OTYgMTQuMDAwMiA4OS4xMzQ5IDEyLjg3MTEgODguNzcyOSAxMS43ODgxQzg4LjQxMSAxMC43MDEgODcuNjIxMyA5LjY0NTk0IDg2LjY3ODMgOC45OTYxOUw3OC42NjU3IDMuNTUxNDZMNzguNTAxOCAzLjI0NDk5Qzg2LjkxOTYgMC43NDMzOTIgOTQuMzA3MiA3LjQyNTYgOTQuMzA3MiAxNy40MTgxVjcwLjcyNzNDOTQuMzA3MiA4MS4zNDI4IDg0LjMwNzIgODkuOTg2MSA3Mi4wODExIDg5Ljk4NjFDNjguNDI4MSA4OS45ODYxIDY0Ljk2NDkgODcuNTIyNiA2NC43MzE3IDg0LjM4MDhDNjQuNDk4NCA4MS4yMzg2IDY3LjY2MTIgNzguMzg3NiA3MS44MTk4IDc4LjM4NzZINzkuMTg3NUw4MC45MDg2IDc5LjU2NjZMODAuOTcxOSA4MC4wMjc5QzgwLjQwMTEgODIuNDQ2NSA3Ny45MDE3IDg0LjM4MDggNzUuMjIyOSA4NC4zODA4SDcxLjcxNDZDNjYuNzM3MyA4NC4zODA4IDYyLjYxODcgNzkuOTczNCA2MS44MTI2IDc1LjQ4MjdDNjEuMDA2NSA3MC45OTE5IDY0LjExNTcgNjcuMzcwMSA2OS4wOTMgNjcuMzcwMUg3Mi4wNTQ3TDM1LjE4NzggNzcuNzMzNEw1Ny45ODgzIDg1LjQ1NzRMNTguMzM1NyA4NS41Njk1QzYwLjUwODkgODIuNzYyMSA1Ny41ODkgODAuOTc2MiA1NC4zMTE5IDgwLjk3NjJDNTEuMDMzOCA4MC45NzYyIDQ4LjExMzkgODIuNzYyMSA0Ny4zOTExIDg1LjU2OTVMNDcuNzM4NiA4NS40NTc0TDI1LjU2NTkgNzcuNzMzNEwyOC41Mjc1IDY3LjM3MDJDNDQuNjUyOSA2Ny4zNzAyIDQ4Ljc5NzQgNzAuMTk3OCA0OC40MzQ4IDc0LjQ4MDhDNzAuODE3OSA3NS4yMzMyIDc4LjUxMDUgNzcuMzg1NCA3NS42NjA3IDgwLjQ0NjVDNzUuMDAzNiA4MC41MDU2IDc0LjM0NTcgODEuMTQ1OCA3NC4yNzk1IDgxLjg1MzFMNzEuODU5MSAxMDEuNzk4QzcwLjk0MjkgMTA1LjM0MyA2Ny45NjU4IDEwNi4zNzIgNjQuNjk2MSAxMDYuMjk4QzY0LjA3NzQgMTA2LjI2OSA2My40ODQ2IDEwNi4xMTkgNjIuOTIxMiAxMDUuODQ4QzYyLjM0ODMgMTA1LjU3NiA2MS44MzgyIDEwNS4xODYgNjEuNDAxMiAxMDQuNjY3TDYwLjk4MzUgMTA0LjAxNUw1Ny42MTIgMTAwLjY0NEM1NS44MjYzIDk4Ljg1NjkgNTMuMDM2NSA5Ny44MjgzIDUwLjI0NzggOTcuODI4M0M0Ny40NTkyIDk3LjgyODMgNDQuNjY5NCA5OC44NTY5IDQyLjg4MTkgMTAwLjY0NEMzOS41MTA1IDEwMy42OTQgMzcuNTE4NiAxMDYuOTQ1IDQzLjc3MDUgMTA2Ljk0NUM0NS44MzUyIDEwNi45NDUgNDcuMjk4NiAxMDYuMTQ3IDQ3LjU4MzMgMTA1LjA0MkM0Ny44Njc5IDEwMy45MzYgNDcuNzE1NCAxMDIuNTc4IDQ3LjMyNDMgMTAxLjM4TDIyLjcxNDYgMjAuMzcxNUwyMi42NTIzIDIwLjI0MjVDMjIuNjQ0MSAyMC4yMjgxIDIyLjYzNTkgMjAuMjEzOCAyMi42Mjc4IDIwLjE5OTVDMjIuNTk1OSAyMC4xNDExIDIyLjU2NCAyMC4wODMyIDIyLjUzMjEgMjAuMDI1MUMyMi4zNTc4IDE5LjY5MTUgMjIuMjQxMiAxOS4zNDM3IDIyLjE4MzcgMTguOTk2OUwyMi4wODUyIDE4LjM3NkMyMi4wMDQyIDE3Ljg4MTIgMjEuOTgzMiAxNy4zNzEzIDIyLjA3OTMgMTYuODg5MUMyMi4xNzU0IDE2LjQwNzEgMjIuMzYyNiAxNS45NDY1IDIyLjYxNzcgMTUuNTY2NUwyMi42OTMxIDE1LjQ0MjJMMjIuODIxMiAxNS4yNzIyTDIyLjk1NTYgMTUuMTY2NUwyMy4xMTggMTUuMDExTDIzLjI5NTcgMTQuODczOUwyMy41MDM5IDE0Ljc2NEwyMy43NDggMTQuNjY3MUwyMy45NzIyIDE0LjU5NTJMNDcuNzM4NiA2LjQxMjZDNzIuMDg1MiAxNi44Njg1IDczLjg2OTMgNDguNzA2NiA0Ny41ODM0IDU1LjI5MzRDMjIuNTY1OCAyMC41MzU1IDI2LjY2NzkgMy4zODU1NCA0Ny41ODM0IDQuOTUyMTlWNS4wNzMzNEMzMS4wNTY3IDkuMzc1MzIgMzEuMTgzMiAyNC4yNjEgNDYuODQyNiAyNS4wOTg5QzYyLjM2NTIgMjUuOTE5MSA1MS4xMDY3IDcxLjI3NDUgMjUuNTY1OCAxNi45MTg5QzI1LjQwMTggMTYuNTM3NSAyNS4zMDk2IDE2LjEzNiAyNS4yNzg5IDE1LjczMzVDMjUuMjUyMiAxNS4zMzA1IDI1LjI1NjYgMTQuOTI1NiAyNS4yOTIxIDE0LjUyNDFMMjUuMzQ2OSAxNC4xMzMxTDI1LjQyODcgMTMuNzU2TDI1LjUzNjQgMTMuMzk5TDI1LjY2ODcgMTMuMDY3TDI1LjgyMzkgMTIuNzY1TDI1Ljk5OTkgMTIuNDk2TDI2LjE5NDQgMTIuMjYzTDI2LjQwNDUgMTIuMDY4TDI2LjYyNzUgMTEuOTEzTDI2Ljg2MDUgMTEuODAyTDI3LjEwMDQgMTEuNzM0TDI3LjM0NDQgMTEuNzEyTDI3LjU4OTQgMTEuNzM0TDI3LjgyOTMgMTEuODAyTDI4LjA2MjMgMTEuOTEzTDI4LjI4NTMgMTIuMDY4TDI4LjQ5NTQgMTIuMjYzTDI4LjY4OTkgMTIuNDk2TDI4Ljg2NTkgMTIuNzY1TDI5LjAyMTEgMTMuMDY3TDI5LjE1MzQgMTMuMzk5TDI5LjI2MTEgMTMuNzU2TDI5LjM0MjkgMTQuMTMzMUwyOS4zOTc3IDE0LjUyNDFMMjkuNDMzMiAxNC45MjU2TDI5LjQ0MDcgMTUuMzMwNUwyOS40MTM5IDE1LjczMzVMMjkuMzU4MiAxNi4xMzZMMjkuMjY2IDE2LjUzNzVMMjkuMTM4NSAxNi45MTg5TDI4Ljk3NzEgMTcuMjcyTDI4Ljc4MzYgMTcuNTk2TDI4LjU1OTggMTcuODg5TDI4LjMwNzkgMTguMTQ4TDI4LjAzMDQgMTguMzcxTDI3LjczMDQgMTguNTU2TDI3LjQxMTEgMTguNjk5TDI3LjA3NjEgMTguNzk4TDI2LjczMDQgMTguODUyTDI2LjM3ODUgMTguODU5TDI2LjAzMjggMTguODJMMjUuNjk3OCAxOC43MzZMMjUuMzc4NSAxOC42MDdMMjUuMDgwNSAxOC40MzZMMjQuODA5OCAxOC4yMjZMMjQuNTY5NyAxNy45ODFMMjQuMzY0MiAxNy43MDVMMjQuMTk3MSAxNy40MDNMMjQuMDcyMiAxNy4wODFMMjMuOTg4OCAxNi43NDVMMjMuOTQ4MiAxNi40MDFMMjMuOTUwOSAxNi4wNTRMMjMuOTk2OCAxNS43MTFMMjQuMDg1MSAxNS4zNzhMMjQuMjE0MyAxNS4wNjFMMjQuMzc5OSAxNC43NjZMMjQuNTc4OSAxNC41TDI0LjgwNjYgMTQuMjY3TDI1LjA1ODUgMTQuMDcyTDI1LjMyOTIgMTMuOTE3TDI1LjYxMzEgMTMuODA2TDI1LjkwNDQgMTMuNzQxTDI2LjE5NzEgMTMuNzI0TDI2LjQ4NTMgMTMuNzU2TDI2Ljc2MzQgMTMuODM2TDI3LjAyNTggMTMuOTYyTDI3LjI2NzIgMTQuMTMyTDI3LjQ4MjcgMTQuMzQyTDI3LjY2NzYgMTQuNTg3TDI3LjgxODIgMTQuODU5TDI3LjkzMTMgMTUuMTUzTDI4LjAwNDQgMTUuNDYxTDI4LjAzNTggMTUuNzc2TDI4LjAyNDUgMTYuMDkxTDI3Ljk3MDcgMTYuNDAyTDI3Ljg3NTUgMTYuNjk4TDI3Ljc0MTEgMTYuOTczTDI3LjU3MDQgMTcuMjE3TDI3LjM2NzQgMTcuNDI0TDI3LjEzNzEgMTcuNTg3TDI2Ljg4NDkgMTcuNzAyTDI2LjYxNjcgMTcuNzY3TDI2LjMzOTQgMTcuNzgxTDI2LjA2MDIgMTcuNzQ0TDI1Ljc4NjQgMTcuNjU3TDI1LjUyNTcgMTcuNTIyTDI1LjI4NTcgMTcuMzQyTDI1LjA3MzcgMTcuMTIyTDI0Ljg5NjkgMTYuODY3TDI0Ljc2MTkgMTYuNTg2TDI0LjY3NDQgMTYuMjg2TDI0LjYzOTQgMTUuOTc0TDI0LjY1ODcgMTUuNjU5TDI0LjczMjggMTUuMzUxTDI0Ljg1OTkgMTUuMDU4TDI1LjAzNjggMTQuNzkyTDI1LjI1OTggMTQuNTU5TDI1LjUyNDQgMTQuMzY3TDI1LjgyMjkgMTQuMjI0TDI2LjE0NzkgMTQuMTM2TDI2LjQ5MTQgMTQuMTA3TDI2Ljg0NDQgMTQuMTQxTDI3LjE5NzYgMTQuMjM3TDI3LjU0MTcgMTQuMzkzTDI3Ljg2NzYgMTQuNjA1TDI4LjE2NjQgMTQuODY3TDI4LjQyOTUgMTUuMTcyTDI4LjY0OTIgMTUuNTE2TDI4LjgyMTIgMTUuODkxTDI4Ljk0MDYgMTYuMjg2TDI5LjAwNDQgMTYuNjk4TDI5LjAxMTIgMTcuMTE0TDI4Ljk2MDQgMTcuNTI2TDI4Ljg1MzQgMTcuOTIxTDI4LjY5MzIgMTguMjkxTDI4LjQ4MzcgMTguNjI3TDI4LjI0OTIgMTguOTIyTDI3Ljk3NDIgMTkuMTY3TDI3LjY3NDIgMTkuMzU5TDI3LjM1NTUgMTkuNDkxTDI3LjAyNDUgMTkuNTYxTDI2LjY4ODcgMTkuNTY3TDI2LjM1NTcgMTkuNTA5TDI2LjAzMzEgMTkuMzg5TDI1LjczMjggMTkuMjExTDI1LjQ2MjQgMTguOTc5TDI1LjI2OTggMTguNjk5TDI1LjA2MzcgMTguNDM2TDI0LjkxMDIgMTguMTQ4TDI0LjgxMjcgMTcuODQyTDI0Ljc3MzYgMTcuNTI2TDI0Ljc5NDYgMTcuMjA3TDI0Ljg3NTYgMTYuODk0TDI1LjAxNTQgMTYuNTk2TDI1LjIxMTYgMTYuMzIyTDI1LjQ1OTggMTYuMDg0TDI1Ljc1NDYgMTUuODkzTDI2LjA4OTQgMTUuNzU3TDI2LjQ1NTcgMTUuNjgzTDI2LjgzNDYgMTUuNjcyTDI3LjIxNTggMTUuNzI0TDI3LjU4ODggMTUuODQ3TDI3Ljk0MzIgMTYuMDM2TDI4LjI2ODggMTYuMjg2TDI4LjU1NTcgMTYuNTkxTDI4Ljc5NDIgMTYuOTQyTDI4Ljk3NjEgMTcuMzMyTDI5LjA5MzggMTcuNzQ0TDI5LjE0MjIgMTguMTY5TDI5LjExOTIgMTguNTk2TDI5LjAyNDUgMTkuMDE0TDI4Ljg2MDggMTkuNDEyTDI4LjYzMTggMTkuNzc2TDI4LjM0MjcgMjAuMDk2TDI4LjAwMDIgMjAuMzYyTDI3LjYxMjUgMjAuNTY3TDI3LjE4OTUgMjAuNzA0TDI2Ljc0MTkgMjAuNzY5TDI2LjI4MTUgMjAuNzU5TDI1LjgyMTIgMjAuNjc0TDI1LjM3MzQgMjAuNTE2TDI0Ljk1MDQgMjAuMjg5TDI0LjU2NDUgMTkuOTk3TDI0LjIyNzcgMTkuNjQ3TDIzLjk1MDkgMTkuMjQ2TDIzLjc0NDcgMTguODA0TDIzLjYxODcgMTguMzMyTDIzLjU3OTkgMTcuODQyTDIzLjYzMjcgMTcuMzUyTDIzLjc3ODcgMTYuODczTDI0LjAxNzcgMTYuNDI2TDI0LjM0NzUgMTYuMDM2TDI0Ljc1NTQgMTUuNzE5TDI1LjIyNzggMTUuNDg3TDI1Ljc0OTUgMTUuMzUyTDI2LjMwNDQgMTUuMzI0TDI2Ljg3NTIgMTUuNDA3TDI3LjQ0NDQgMTUuNjAyTDI3Ljk5NDIgMTUuOTA3TDI4LjUwNjUgMTYuMzE3TDI4Ljk2MzQgMTYuODI0TDI5LjM0NzcgMTcuNDE0TDI5LjY0MzQgMTguMDcyTDI5LjgzNTggMTguNzg5TDI5LjkxMTUgMTkuNTM5TDI5Ljg2ODkgMjAuMjk2TDI5LjcwODIgMjEuMDM2TDI5LjQzMTggMjEuNzM2TDI5LjA0MzUgMjIuMzc1TDI4LjU0OTUgMjIuOTM0TDI3Ljk1NzYgMjMuMzk2TDI3LjI3NzggMjMuNzQ2TDI2LjUyMTUgMjMuOTcyTDI1LjcwMTcgMjQuMDY2TDI0LjgzMzEgMjQuMDI4TDIzLjkzMTcgMjMuODU2TDIzLjAxNDUgMjMuNTUzTDIyLjA5OTUgMjMuMTI0TDIxLjIwNTQgMjIuNTc3TDIwLjM1MDggMjEuOTIxTDE5LjU1NDIgMjEuMTY3TDE4LjgzMzkgMjAuMzI3TDE4LjIwODggMTkuNDE0TDE3LjY5NzIgMTguNDQyTDE3LjMxNjUgMTcuNDI3TDE3LjA4MjcgMTYuMzg2TDE2Ljk5OTkgMTUuMzM3TDE3LjA3MTYgMTQuMjk5TDE3LjI5OTYgMTMuMjg5TDE3LjY4MzggMTIuMzI2TDE4LjIyMjcgMTEuNDI3TDE4LjkwOTkgMTAuNjA5TDE5LjczMzggOS44ODk5TDIwLjY3OTQgOS4yODQ5TDIxLjcyOTQgOC44MDk5TDIyLjg2NDQgOC40NzU5TDI0LjA2MzQgOC4yOTI5TDI1LjMwMzQgOC4yNjg5TDI2LjU2MDQgOC40MDI5TDI3LjgwOTQgOC42OTI5TDI5LjAyMjQgOS4xMzU5TDMwLjE3MjQgOS43MjE5TDMxLjIzMjQgMTAuNDM3TDMyLjE3NjQgMTEuMjY3TDMzLjAwMDQgMTIuMTk3TDMzLjY3MDQgMTMuMjA3TDM0LjE3MjQgMTQuMjc3TDM0LjQ5NDQgMTUuMzg3TDM0LjYyNDQgMTYuNTE3TDM0LjU1MjQgMTcuNjQ3TDM0LjI3ODQgMTguNzQ3TDMzLjgwNjQgMTkuNzk3TDMzLjE0MDQgMjAuNzY3TDMyLjI5NjQgMjEuNjM3TDMxLjI4ODQgMjIuMzg3TDMwLjEzMjQgMjMuMDA3TDI4Ljg0NjQgMjMuNDc3TDI3LjQ1MDQgMjMuNzg3VDI1Ljk2NjQgMjMuOTI3SDI0LjQxNjRMMjIuODI2NCAyMy43ODdIMjEuMjE2NEwxOS42MTY0IDIzLjQ0N0gxOC4wNDY0TDE2LjUzNjQgMjIuOTA3SDE1LjExNjRMMTMuODE2NCAyMi4xNjdIMTIuNjY2NEwxMS43MDY0IDIxLjI0N0gxMC45NjY0TDEwLjQ3NjQgMjAuMDg3SDEwLjI3NjRMOS40MjY0IDE5LjA5N0g5LjAyNjRMOC4zODY0IDE4LjMwN0g4LjA5NjRMNy41NTY0IDE3LjczN0g3LjI0NjRMNi43MjY0IDE3LjM5N0g2LjI3NjRMNS43MTY0IDE3LjI3N0g1LjE0NjRMNC41NzY0IDE3LjQ1N0g0LjAyNjRMMy41MTY0IDE3Ljg5N0gzLjA3NjRMMi43MjY0IDE4LjUzN0gyLjQ4NjRMMi4zMzY0IDE5LjI5N0gyLjI4NjRMMi4zMzY0IDIwLjA5N0gyLjQ4NjRMMi43MjY0IDIwLjg1N0gzLjA3NjRMMy41MTY0IDIxLjM5N0g0LjAyNjRMMTguMDQ2NCAyMy40NDdIMjEuMjE2NEwyNC40MTY0IDIzLjkyN0gyNy42MzY0TDMwLjg1NjQgMjMuODI3SDM0LjA1NjRMMzcuMjE2NCAyMy4xNDdINDAuMzA2NEw0My4zMDY0IDIxLjg5N0g0Ni4xOTY0TDQ4Ljk1NjQgMTkuOTk3SDUxLjU2NjRMNTMuOTk2NCAxNy4zOTdINTYuMTY2NEw1OC4wMzY0IDE0LjA5N0g1OS41ODY0TDYwLjc1NjQgMTAuMDk3SDYxLjU0NjRMNjEuOTU2NCA1LjI5N0g2MS45ODY0WiIgZmlsbD0idXJsKCNwYWludDBfbGluZWFyXzIyM180Mjk2KSIvPgogIDxkZWZzPgogICAgPGxpbmVhckdyYWRpZW50IGlkPSJwYWludDBfbGluZWFyXzIyM180Mjk2IiB4MT0iNTAuNDU0NSIgeTE9IjEuNjA5NzciIHgyPSI1MC40NTQ1IiB5Mj0iMTA2Ljk0NSIgZ3JhZGllbnRVbml0cz0idXNlclNwYWNlT25Vc2UiPgogICAgICA8c3RvcCBzdG9wLWNvbG9yPSIjMTY4OEU1Ii8+CiAgICAgIDxzdG9wIG9mZnNldD0iMSIgc3RvcC1jb2xvcj0iIzAyQUNDMSIvPgogICAgPC9saW5lYXJHcmFkaWVudD4KICA8L2RlZnM+Cjwvc3ZnPgo="
+                        alt="PPPSH Logo" class="about-logo">
+                    <p class="about-intro-text">
+                        Este sistema integra inteligencia artificial y aprendizaje automático para anticipar riesgos de saturación hospitalaria, optimizar recursos y mejorar la resiliencia del sistema de salud.
+                    </p>
+                </div>
+
+                <div class="about-section">
+                    <h2>Nuestra Misión</h2>
+                    <p>
+                        Proporcionar a los administradores hospitalarios y equipos médicos una herramienta tecnológica avanzada que les permita anticiparse a situaciones críticas de saturación, facilitando la toma de decisiones informadas y oportunas para garantizar la mejor atención posible a los pacientes.
+                    </p>
+                    <p>
+                        Mediante el uso de algoritmos de inteligencia artificial, la plataforma analiza patrones históricos, tendencias actuales y múltiples variables para generar predicciones confiables que ayuden a prevenir el colapso de los servicios de salud.
+                    </p>
+                </div>
+
+                <div class="about-section">
+                    <h2>Características Principales</h2>
+                    <div class="features-grid">
+                        <div class="feature-card">
+                            <i class="fas fa-brain icon-gradient"></i>
+                            <h4>Inteligencia Artificial</h4>
+                            <p>Modelos de machine learning entrenados con datos históricos para predicciones precisas.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-heartbeat icon-gradient"></i>
+                            <h4>Enfoque en Salud</h4>
+                            <p>Diseñado específicamente para optimizar la atención médica y salvar vidas.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-chart-line icon-gradient"></i>
+                            <h4>Análisis Predictivo</h4>
+                            <p>Anticipa escenarios de saturación con 24-48 horas de anticipación.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-database icon-gradient"></i>
+                            <h4>Gestión de Datos</h4>
+                            <p>Centraliza y procesa información de múltiples hospitales en tiempo real.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-shield-alt icon-gradient"></i>
+                            <h4>Seguridad y Privacidad</h4>
+                            <p>Protección de datos sensibles con estándares de seguridad hospitalaria.</p>
+                        </div>
+                        <div class="feature-card">
+                            <i class="fas fa-tachometer-alt icon-gradient"></i>
+                            <h4>Respuesta Rápida</h4>
+                            <p>Alertas instantáneas y herramientas para toma de decisiones inmediatas.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="about-section">
+                    <h2>Tecnología</h2>
+                    <div class="technology-grid">
+                        <div class="tech-card">
+                            <h4>Machine Learning</h4>
+                            <p>Algoritmos avanzados de aprendizaje automático que mejoran continuamente su precisión con cada predicción.</p>
+                        </div>
+                        <div class="tech-card">
+                            <h4>Análisis en Tiempo Real</h4>
+                            <p>Procesamiento instantáneo de datos hospitalarios para alertas y visualizaciones actualizadas.</p>
+                        </div>
+                        <div class="tech-card">
+                            <h4>Visualización Intuitiva</h4>
+                            <p>Dashboards interactivos y gráficos claros para facilitar la comprensión de información compleja.</p>
+                        </div>
+                        <div class="tech-card">
+                            <h4>Integración de Datos</h4>
+                            <p>Compatible con múltiples formatos de datos hospitalarios para una implementación flexible.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="social-impact-box">
+                    <h3>Impacto Social</h3>
+                    <p>
+                        PPPSH contribuye a salvar vidas al permitir que los sistemas de salud respondan proactivamente a los desafíos, redistribuyan eficientemente los recursos disponibles y garanticen que cada paciente reciba la atención que necesita en el momento adecuado.
+                    </p>
+                    <button class="btn-primary" onclick="window.location.href='{{ url_for('dashboard') }}'">Volver al Dashboard</button>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

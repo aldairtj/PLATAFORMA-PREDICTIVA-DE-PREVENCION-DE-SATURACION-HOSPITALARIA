@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ingreso de Datos Diarios - PPPSH</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <a href="{{ url_for('dashboard') }}"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <a href="{{ url_for('predictions') }}"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item active">
+                        <i class="fas fa-plus-circle"></i>
+                        <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cogs"></i>
+                        <a href="{{ url_for('gestion_operativa') }}"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="{{ url_for('acerca_de') }}"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <i class="fas fa-cog"></i>
+                <span>Configuración</span>
+            </div>
+        </aside>
+
+        <main class="main-content">
+            <header class="top-header">
+                <div class="date-info">
+                    {{ fecha_actual }}
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">{{ hospital_nombre }}</span>
+                    <a href="{{ url_for('logout') }}" style="margin-left: 15px; color: #666;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="dashboard-body">
+                <h1 class="section-title">Ingreso de Datos Diarios</h1>
+                <p class="subtitle">Complete la información del día - {{ hospital_nombre }}</p>
+                
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                    {% if messages %}
+                        <div class="flash-messages">
+                            {% for category, message in messages %}
+                                <div class="flash {{ category }}">{{ message }}</div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                {% endwith %}
+
+                <div class="form-container">
+                    <form action="{{ url_for('guardar_datos') }}" method="POST" class="data-form">
+                        
+                        <!-- Sección 1: Información del Día -->
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <i class="fas fa-calendar-day icon-blue"></i>
+                                <h3>Información del Día</h3>
+                            </div>
+                            <div class="form-grid-3">
+                                <div class="form-group">
+                                    <label for="fecha">Fecha *</label>
+                                    <input type="date" name="fecha" id="fecha" value="{{ fecha_hoy }}" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="es_festivo">¿Es día festivo?</label>
+                                    <select name="es_festivo" id="es_festivo" class="form-input">
+                                        <option value="0">No</option>
+                                        <option value="1">Sí</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="nombre_festivo">Nombre del festivo</label>
+                                    <input type="text" name="nombre_festivo" id="nombre_festivo" placeholder="Ej: Año Nuevo" class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 2: Asistencia Diaria -->
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <i class="fas fa-procedures icon-green"></i>
+                                <h3>Asistencia Diaria por Especialidad</h3>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label for="total_pacientes">Total de Pacientes *</label>
+                                    <input type="number" name="total_pacientes" id="total_pacientes" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="emergencia">Emergencia *</label>
+                                    <input type="number" name="emergencia" id="emergencia" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pediatria">Pediatría *</label>
+                                    <input type="number" name="pediatria" id="pediatria" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="medicina_interna">Medicina Interna *</label>
+                                    <input type="number" name="medicina_interna" id="medicina_interna" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cirugia_general">Cirugía General *</label>
+                                    <input type="number" name="cirugia_general" id="cirugia_general" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ginecologia">Ginecología *</label>
+                                    <input type="number" name="ginecologia" id="ginecologia" min="0" required class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 3: Capacidad Hospitalaria -->
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <i class="fas fa-bed icon-purple"></i>
+                                <h3>Capacidad Hospitalaria</h3>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label for="camas_uci_totales">Camas UCI Totales *</label>
+                                    <input type="number" name="camas_uci_totales" id="camas_uci_totales" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="camas_uci_ocupadas">Camas UCI Ocupadas *</label>
+                                    <input type="number" name="camas_uci_ocupadas" id="camas_uci_ocupadas" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="camas_emergencia_totales">Camas Emergencia Totales *</label>
+                                    <input type="number" name="camas_emergencia_totales" id="camas_emergencia_totales" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="camas_emergencia_ocupadas">Camas Emergencia Ocupadas *</label>
+                                    <input type="number" name="camas_emergencia_ocupadas" id="camas_emergencia_ocupadas" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="camas_hospitalizacion_totales">Camas Hospitalización Totales *</label>
+                                    <input type="number" name="camas_hospitalizacion_totales" id="camas_hospitalizacion_totales" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="camas_hospitalizacion_ocupadas">Camas Hospitalización Ocupadas *</label>
+                                    <input type="number" name="camas_hospitalizacion_ocupadas" id="camas_hospitalizacion_ocupadas" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pacientes_espera">Pacientes en Espera *</label>
+                                    <input type="number" name="pacientes_espera" id="pacientes_espera" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="tiempo_espera_promedio">Tiempo Espera Promedio (min) *</label>
+                                    <input type="number" name="tiempo_espera_promedio" id="tiempo_espera_promedio" min="0" required class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Sección 4: Personal Médico -->
+                        <div class="form-section-card">
+                            <div class="form-section-header">
+                                <i class="fas fa-user-md icon-orange"></i>
+                                <h3>Personal Médico</h3>
+                            </div>
+                            <div class="form-grid-2">
+                                <div class="form-group">
+                                    <label for="emergencia_doctores">Doctores Emergencia *</label>
+                                    <input type="number" name="emergencia_doctores" id="emergencia_doctores" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="emergencia_enfermeras">Enfermeras Emergencia *</label>
+                                    <input type="number" name="emergencia_enfermeras" id="emergencia_enfermeras" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pediatria_doctores">Doctores Pediatría *</label>
+                                    <input type="number" name="pediatria_doctores" id="pediatria_doctores" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="pediatria_enfermeras">Enfermeras Pediatría *</label>
+                                    <input type="number" name="pediatria_enfermeras" id="pediatria_enfermeras" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="medicina_doctores">Doctores Medicina Interna *</label>
+                                    <input type="number" name="medicina_doctores" id="medicina_doctores" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="medicina_enfermeras">Enfermeras Medicina Interna *</label>
+                                    <input type="number" name="medicina_enfermeras" id="medicina_enfermeras" min="0" required class="form-input">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Botones de acción -->
+                        <div class="form-actions">
+                            <button type="submit" class="btn-primary btn-large">
+                                <i class="fas fa-save"></i> Guardar Datos del Día
+                            </button>
+                            <button type="button" class="btn-secondary" onclick="window.location.href='{{ url_for('dashboard') }}'">
+                                <i class="fas fa-times"></i> Cancelar
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Establecer fecha actual por defecto
+        document.addEventListener('DOMContentLoaded', function() {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('fecha').value = today;
+            
+            // Auto-calcular algunos campos basados en otros
+            const camasUciOcupadas = document.getElementById('camas_uci_ocupadas');
+            const camasUciTotales = document.getElementById('camas_uci_totales');
+            
+            if (camasUciTotales && camasUciOcupadas) {
+                camasUciTotales.addEventListener('input', function() {
+                    if (parseInt(camasUciOcupadas.value) > parseInt(this.value)) {
+                        camasUciOcupadas.value = this.value;
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>

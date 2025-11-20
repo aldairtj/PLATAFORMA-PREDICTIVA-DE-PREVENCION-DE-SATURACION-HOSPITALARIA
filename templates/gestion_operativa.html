@@ -4,9 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión Operativa - Dashboard Hospitalario</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    </head>
+</head>
 <body>
     <div class="dashboard-container">
         <aside class="sidebar">
@@ -17,19 +17,23 @@
                 <ul>
                     <li class="nav-item">
                         <i class="fas fa-home"></i>
-                        <a href="index.html"><span>Inicio</span></a>
+                        <a href="{{ url_for('dashboard') }}"><span>Inicio</span></a>
                     </li>
                     <li class="nav-item">
                         <i class="fas fa-chart-line"></i>
-                        <a href="predictions.html"><span>Predicciones</span></a>
+                        <a href="{{ url_for('predictions') }}"><span>Predicciones</span></a>
                     </li>
-                    <li class="nav-item active"> 
+                    <li class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                    </li>
+                    <li class="nav-item active">
                         <i class="fas fa-cogs"></i>
-                        <a href="gestion_operativa.html"><span>Gestión Operativa</span></a>
+                        <a href="{{ url_for('gestion_operativa') }}"><span>Gestión Operativa</span></a>
                     </li>
                     <li class="nav-item">
                         <i class="fas fa-info-circle"></i>
-                        <a href="acerca_de.html"><span>Acerca de</span></a>
+                        <a href="{{ url_for('acerca_de') }}"><span>Acerca de</span></a>
                     </li>
                 </ul>
             </nav>
@@ -42,36 +46,38 @@
         <main class="main-content">
             <header class="top-header">
                 <div class="date-info">
-                    Viernes, 14 de Noviembre de 2025
+                    {{ fecha_actual }}
                 </div>
                 <div class="user-info">
                     <i class="fas fa-bell"></i>
                     <span>Administrador</span>
-                    <span class="hospital-name">Hospital Central</span>
+                    <span class="hospital-name">{{ hospital_nombre }}</span>
+                    <a href="{{ url_for('logout') }}" style="margin-left: 15px; color: #666;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
                     <i class="fas fa-user-circle"></i>
                 </div>
             </header>
 
             <section class="dashboard-body">
-                <h1 class="section-title">Gestión Operativa</h1>
+                <h1 class="section-title">Gestión Operativa - {{ hospital_nombre }}</h1>
                 <p class="subtitle">Herramientas para la toma de decisiones preventivas y redistribución de recursos</p>
-
+                
                 <div class="action-cards-grid">
-                    
                     <div class="action-card">
                         <i class="fas fa-bed icon-blue-light"></i>
                         <h3>Reasignar Camas</h3>
                         <p>Redistribuye camas disponibles entre hospitales según demanda</p>
                         <button class="btn-action">Iniciar solicitud</button>
                     </div>
-
+                    
                     <div class="action-card">
                         <i class="fas fa-user-plus icon-purple"></i>
                         <h3>Trasladar Pacientes</h3>
                         <p>Coordina el traslado de pacientes a centros con menor ocupación</p>
                         <button class="btn-action">Iniciar solicitud</button>
                     </div>
-
+                    
                     <div class="action-card">
                         <i class="fas fa-box icon-green-light"></i>
                         <h3>Solicitar Recursos</h3>
@@ -81,23 +87,25 @@
                 </div>
 
                 <div class="recent-actions-section">
-                    <h2 class="section-sub-title">Acciones Recientes</h2>
+                    <h2 class="section-sub-title">Acciones Recientes - {{ hospital_nombre }}</h2>
                     <ul class="actions-list">
                         <li class="action-item">
                             <i class="far fa-circle action-icon"></i>
-                            <span class="action-text">Reasignación de camas: Hospital Central → Hospital Sur</span>
+                            <span class="action-text">Reasignación de camas: {{ hospital_nombre }} → Hospital Juliaca</span>
                             <span class="status completed">Completado</span>
                             <span class="action-details">15 camas UCI · Hace 2 horas</span>
                         </li>
+                        
                         <li class="action-item">
                             <i class="far fa-circle action-icon"></i>
-                            <span class="action-text">Solicitud: Hospital Este</span>
+                            <span class="action-text">Solicitud: {{ hospital_nombre }}</span>
                             <span class="status in-progress">En proceso</span>
                             <span class="action-details">20 ventiladores · Hace 4 horas</span>
                         </li>
+                        
                         <li class="action-item">
                             <i class="far fa-circle action-icon"></i>
-                            <span class="action-text">Traslado de pacientes: Hospital Norte → Hospital Oeste</span>
+                            <span class="action-text">Traslado de pacientes: {{ hospital_nombre }} → Hospital Arequipa</span>
                             <span class="status completed">Completado</span>
                             <span class="action-details">8 pacientes · Hace 6 horas</span>
                         </li>
@@ -106,6 +114,7 @@
             </section>
         </main>
     </div>
-    <script src="script.js"></script>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>
