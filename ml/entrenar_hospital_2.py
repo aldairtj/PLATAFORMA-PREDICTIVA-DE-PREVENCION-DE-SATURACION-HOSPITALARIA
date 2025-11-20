@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import pickle
 import warnings
+import os
+
 warnings.filterwarnings('ignore')
 
 print("Entrenamiento Modelo - Hospital Carlos Monge Medrano (Juliaca)")
@@ -14,12 +16,19 @@ HOSPITAL_ID = 2
 HOSPITAL_NOMBRE = "Hospital Carlos Monge Medrano"
 MODELO_ARCHIVO = f'ml/modelos/hospital_{HOSPITAL_ID}.pkl'
 
-# Conexión con ruta completa del proyecto
+# Ruta relativa a la BD del proyecto
+directorio_actual = os.path.dirname(__file__)
+directorio_proyecto = os.path.dirname(directorio_actual)
+ruta_bd = os.path.join(directorio_proyecto, 'data', 'BASEH.fdb')
+
+print(f"Buscando BD en: {ruta_bd}")
+
+# Conexión
 try:
     print("Conectando a BD...")
     conn = firebirdsql.connect(
         host='localhost',
-        database='C:/BD_HOSPITAL/BASEH.FDB',
+        database=ruta_bd,
         user='SYSDBA',
         password='masterkey',
         charset='UTF8'
@@ -30,7 +39,6 @@ except Exception as e:
     exit()
 
 try:
-    # Query simplificada
     query = f"""
     SELECT 
         ad.FECHA,
@@ -52,14 +60,12 @@ try:
     df = pd.read_sql(query, conn)
     print(f"Datos cargados: {len(df)} registros")
     
-    # Preparación de datos
     df = df.sort_values('FECHA')
     df['UCI_24H'] = df['CAMAS_UCI_OCUPADAS'].shift(-1)
     df = df.dropna()
     
     print(f"Datos para entrenamiento: {len(df)} registros")
     
-    # Features esenciales
     features = [
         'TOTAL_PACIENTES',
         'EMERGENCIA', 
@@ -73,21 +79,17 @@ try:
     X = df[features]
     y = df['UCI_24H']
     
-    # Entrenamiento
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
     
     modelo = xgb.XGBRegressor(n_estimators=80, max_depth=5, random_state=42)
     modelo.fit(X_train, y_train)
     
-    # Evaluación
     y_pred = modelo.predict(X_test)
     mae = mean_absolute_error(y_test, y_pred)
     
     print(f"Modelo 24h - Error: {mae:.2f} camas")
     print(f"Rango UCI: {y.min():.0f}-{y.max():.0f} camas")
     
-    # Guardar en ml/modelos/
-    import os
     os.makedirs('ml/modelos', exist_ok=True)
     with open(MODELO_ARCHIVO, 'wb') as f:
         pickle.dump(modelo, f)

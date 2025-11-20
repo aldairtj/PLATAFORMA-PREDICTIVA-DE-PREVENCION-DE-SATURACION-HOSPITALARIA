@@ -5,6 +5,8 @@ from sklearn.model_selection import train_test_split
 from sklearn.metrics import mean_absolute_error
 import pickle
 import warnings
+import os
+
 warnings.filterwarnings('ignore')
 
 print("Entrenamiento Modelo - Hospital Regional Manuel Núñez Butrón (Puno)")
@@ -14,12 +16,20 @@ HOSPITAL_ID = 1
 HOSPITAL_NOMBRE = "Hospital Regional Manuel Núñez Butrón"
 MODELO_ARCHIVO = f'ml/modelos/hospital_{HOSPITAL_ID}.pkl'
 
-# Conexión con ruta completa del proyecto
+# 🎯 RUTA RELATIVA - funciona en cualquier PC
+# Sube 1 nivel desde ml/ hasta la raíz, luego entra a data/
+directorio_actual = os.path.dirname(__file__)  # Carpeta ml/
+directorio_proyecto = os.path.dirname(directorio_actual)  # Carpeta raíz
+ruta_bd = os.path.join(directorio_proyecto, 'data', 'BASEH.fdb')
+
+print(f"Buscando BD en: {ruta_bd}")
+
+# Conexión con ruta relativa
 try:
     print("Conectando a BD...")
     conn = firebirdsql.connect(
         host='localhost',
-        database='C:/BD_HOSPITAL/BASEH.FDB',  # 🎯 Ruta completa que SÍ funciona
+        database=ruta_bd,  # 🎯 Ruta relativa calculada
         user='SYSDBA',
         password='masterkey',
         charset='UTF8'
@@ -27,6 +37,7 @@ try:
     print("Conexión exitosa")
 except Exception as e:
     print(f"Error: {e}")
+    print("Asegúrate de que la BD está en: data/BASEH.fdb")
     exit()
 
 try:
@@ -87,7 +98,6 @@ try:
     print(f"Rango UCI: {y.min():.0f}-{y.max():.0f} camas")
     
     # Guardar en ml/modelos/
-    import os
     os.makedirs('ml/modelos', exist_ok=True)
     with open(MODELO_ARCHIVO, 'wb') as f:
         pickle.dump(modelo, f)
