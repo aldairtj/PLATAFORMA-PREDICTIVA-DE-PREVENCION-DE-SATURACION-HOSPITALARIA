@@ -38,9 +38,12 @@
                 </ul>
             </nav>
             <div class="sidebar-footer">
-                <i class="fas fa-cog"></i>
-                <span>Configuración</span>
+                <a href="{{ url_for('configuracion') }}" style="color: inherit; text-decoration: none;">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
             </div>
+
         </aside>
 
         <main class="main-content">

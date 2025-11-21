@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Configuración - Dashboard Hospitalario</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    </head>
+<body>
+    <div class="dashboard-container">
+        
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <span class="logo-text">PPPSH</span>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul>
+                    <li class="nav-item">
+                        <i class="fas fa-home"></i>
+                        <a href="{{ url_for('dashboard') }}"><span>Inicio</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-chart-line"></i>
+                        <a href="{{ url_for('predictions') }}"><span>Predicciones</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-plus-circle"></i>
+                        <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-cogs"></i>
+                        <a href="{{ url_for('gestion_operativa') }}"><span>Gestión Operativa</span></a>
+                    </li>
+                    <li class="nav-item">
+                        <i class="fas fa-info-circle"></i>
+                        <a href="{{ url_for('acerca_de') }}"><span>Acerca de</span></a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer active">
+                <a href="{{ url_for('configuracion') }}" style="color: inherit; text-decoration: none;">
+                    <i class="fas fa-cog"></i>
+                    <span>Configuración</span>
+                </a>
+            </div>
+        </aside>
+
+        <main class="main-content">
+
+            <header class="top-header">
+                <div class="date-info">
+                    {{ fecha_actual }}
+                </div>
+                <div class="user-info">
+                    <i class="fas fa-bell"></i>
+                    <span>Administrador</span>
+                    <span class="hospital-name">{{ hospital_nombre }}</span>
+                    <a href="{{ url_for('logout') }}" style="margin-left: 15px; color: #666;">
+                        <i class="fas fa-sign-out-alt"></i> Cerrar Sesión
+                    </a>
+                    <i class="fas fa-user-circle"></i>
+                </div>
+            </header>
+
+            <section class="dashboard-body">
+                <h2 class="section-title">⚙️ Configuración del Sistema</h2>
+
+                <div class="settings-tabs-nav">
+                    <button class="tab-button active" data-tab="general"><i class="fas fa-wrench"></i> General</button>
+                    <button class="tab-button" data-tab="security"><i class="fas fa-user-shield"></i> Seguridad y Usuarios</button>
+                    <button class="tab-button" data-tab="data-mgt"><i class="fas fa-database"></i> Gestión de Datos</button>
+                    <button class="tab-button" data-tab="system-status"><i class="fas fa-chart-bar"></i> Estado del Sistema</button>
+                </div>
+
+                <div class="settings-content">
+                    
+                    <div id="general" class="tab-pane active">
+                        <h3>Opciones Generales</h3>
+                        <div class="settings-grid">
+                            
+                            <div class="setting-card">
+                                <i class="fas fa-hospital setting-icon"></i>
+                                <h3>Datos del Hospital</h3>
+                                <p>Actualiza el nombre, dirección y contactos de la institución.</p>
+                                <button class="btn-config">Editar Información</button>
+                            </div>
+
+                            <div class="setting-card">
+                                <i class="fas fa-palette setting-icon"></i>
+                                <h3>Apariencia</h3>
+                                <p>Personaliza el tema, colores y logo del Dashboard.</p>
+                                <button class="btn-config">Personalizar Diseño</button>
+                            </div>
+
+                            <div class="setting-card">
+                                <i class="fas fa-bell setting-icon"></i>
+                                <h3>Notificaciones</h3>
+                                <p>Define umbrales de alerta y canales de notificación (email, push).</p>
+                                <button class="btn-config">Configurar Alertas</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="security" class="tab-pane" style="display:none;">
+                        <h3>Seguridad y Gestión de Accesos</h3>
+                        <div class="settings-grid">
+                            
+                            <div class="setting-card">
+                                <i class="fas fa-users setting-icon"></i>
+                                <h3>Gestión de Usuarios</h3>
+                                <p>Añade, edita o elimina cuentas de usuario y define roles.</p>
+                                <button class="btn-config">Administrar Usuarios</button>
+                            </div>
+
+                            <div class="setting-card">
+                                <i class="fas fa-lock setting-icon"></i>
+                                <h3>Roles y Permisos</h3>
+                                <p>Asigna permisos específicos a cada rol (Administrador, Doctor, Analista).</p>
+                                <button class="btn-config">Definir Permisos</button>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <i class="fas fa-key setting-icon"></i>
+                                <h3>Mi Perfil</h3>
+                                <p>Cambia tu contraseña, verifica tu sesión y actualiza tus datos personales.</p>
+                                <button class="btn-config">Gestionar Perfil</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="data-mgt" class="tab-pane" style="display:none;">
+                        <h3>Conexión y Mantenimiento de Datos</h3>
+                        <div class="settings-grid">
+                            
+                            <div class="setting-card">
+                                <i class="fas fa-database setting-icon"></i>
+                                <h3>Conexión DB</h3>
+                                <p>Configura la conexión a la base de datos (credenciales, host).</p>
+                                <button class="btn-config">Ver Parámetros</button>
+                            </div>
+
+                            <div class="setting-card">
+                                <i class="fas fa-cloud-upload-alt setting-icon"></i>
+                                <h3>Respaldo y Recuperación</h3>
+                                <p>Programa copias de seguridad automáticas y restaura datos.</p>
+                                <button class="btn-config">Programar Respaldo</button>
+                            </div>
+
+                            <div class="setting-card">
+                                <i class="fas fa-file-export setting-icon"></i>
+                                <h3>Importar/Exportar</h3>
+                                <p>Herramientas para la carga masiva de datos y exportación de reportes.</p>
+                                <button class="btn-config">Usar Herramienta</button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="system-status" class="tab-pane" style="display:none;">
+                        <h3>Monitoreo y Diagnóstico</h3>
+                        <div class="settings-grid">
+                            
+                            <div class="setting-card">
+                                <i class="fas fa-server setting-icon"></i>
+                                <h3>Estado del Servidor</h3>
+                                <p>Consulta la carga, memoria y tiempo de actividad del servidor principal.</p>
+                                <button class="btn-config">Ver Logs</button>
+                            </div>
+                            
+                            <div class="setting-card">
+                                <i class="fas fa-bug setting-icon"></i>
+                                <h3>Logs y Errores</h3>
+                                <p>Accede a los registros de actividad y diagnóstico del sistema.</p>
+                                <button class="btn-config">Revisar Logs</button>
+                            </div>
+
+                            <div class="setting-card">
+                                <i class="fas fa-code-branch setting-icon"></i>
+                                <h3>Versión y Actualizaciones</h3>
+                                <p>Información sobre la versión actual y disponibilidad de nuevas actualizaciones.</p>
+                                <button class="btn-config">Buscar Actualización</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+    </div>
+    
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+    
+</body>
+</html>

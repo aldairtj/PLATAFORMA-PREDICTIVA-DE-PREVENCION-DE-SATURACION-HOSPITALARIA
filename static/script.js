@@ -178,3 +178,49 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+
+    // Función para mostrar la pestaña activa
+    function showTab(tabId) {
+        // 1. Ocultar todos los contenidos de pestaña y quitar clase 'active'
+        tabPanes.forEach(pane => {
+            pane.style.display = 'none';
+            pane.classList.remove('active');
+        });
+
+        // 2. Desactivar todos los botones
+        tabButtons.forEach(button => {
+            button.classList.remove('active');
+        });
+
+        // 3. Mostrar el contenido de la pestaña seleccionada
+        const activePane = document.getElementById(tabId);
+        if (activePane) {
+            // Utilizamos un pequeño retraso para asegurar que la animación CSS se dispare
+            activePane.style.display = 'block'; 
+            setTimeout(() => {
+                activePane.classList.add('active');
+            }, 50);
+        }
+    }
+
+    // Event Listeners para cada botón de pestaña
+    tabButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // 4. Activar el botón clicado
+            this.classList.add('active');
+
+            // Obtener el ID de la pestaña de destino (por ejemplo: 'general', 'security')
+            const targetTabId = this.getAttribute('data-tab');
+            showTab(targetTabId);
+        });
+    });
+
+    // Inicializar: Mostrar la primera pestaña por defecto al cargar
+    if (tabButtons.length > 0) {
+        tabButtons[0].click(); // Simular clic en el primer botón para inicializar
+    }
+});

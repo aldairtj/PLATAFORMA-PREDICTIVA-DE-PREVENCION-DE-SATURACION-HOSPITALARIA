@@ -14,10 +14,10 @@ def get_db_connection():
         directorio_actual = os.path.dirname(os.path.abspath(__file__))
         ruta_bd = os.path.join(directorio_actual, 'data', 'BASEH.fdb')
         
-        print(f"🔍 Buscando BD en: {ruta_bd}")
+        print(f" Buscando BD en: {ruta_bd}")
         
         if not os.path.exists(ruta_bd):
-            print("❌ ERROR: El archivo BASEH.FDB no existe")
+            print(" ERROR: El archivo BASEH.FDB no existe")
             return None
             
         conn = firebirdsql.connect(
@@ -27,10 +27,10 @@ def get_db_connection():
             password='masterkey',
             charset='ISO8859_1'
         )
-        print("✅ Conexión a BD exitosa")
+        print(" Conexión a BD exitosa")
         return conn
     except Exception as e:
-        print(f"❌ Error conectando a BD: {e}")
+        print(f" Error conectando a BD: {e}")
         return None
 
 # Cargar modelo ML
@@ -40,22 +40,22 @@ def cargar_modelo_ml(hospital_id):
         modelo_path = os.path.join(directorio_actual, 'ml', 'modelos', f'hospital_{hospital_id}.pkl')
         
         if not os.path.exists(modelo_path):
-            print(f"❌ Modelo no encontrado: {modelo_path}")
+            print(f" Modelo no encontrado: {modelo_path}")
             return None
             
         with open(modelo_path, 'rb') as f:
             modelo = pickle.load(f)
-        print(f"✅ Modelo ML cargado para hospital {hospital_id}")
+        print(f" Modelo ML cargado para hospital {hospital_id}")
         return modelo
     except Exception as e:
-        print(f"❌ Error cargando modelo ML: {e}")
+        print(f" Error cargando modelo ML: {e}")
         return None
 
 # Obtener métricas REALES desde BD
 def obtener_metricas_reales(hospital_id):
     conn = get_db_connection()
     if not conn:
-        print("❌ No se pudo conectar a BD para métricas")
+        print(" No se pudo conectar a BD para métricas")
         return None
         
     try:
@@ -79,10 +79,10 @@ def obtener_metricas_reales(hospital_id):
         datos = cur.fetchone()
         
         if not datos:
-            print("❌ No se encontraron datos para el hospital")
+            print(" No se encontraron datos para el hospital")
             return None
             
-        print(f"📊 Datos BD obtenidos: UCI={datos[0]}/{datos[1]}, Espera={datos[3]}, Total={datos[4]}")
+        print(f" Datos BD obtenidos: UCI={datos[0]}/{datos[1]}, Espera={datos[3]}, Total={datos[4]}")
         
         # Calcular porcentajes
         ocupacion_uci = round((datos[0] / datos[1]) * 100) if datos[1] > 0 else 0
@@ -124,10 +124,10 @@ def obtener_metricas_reales(hospital_id):
                 
                 prediccion = modelo.predict([datos_prediccion])
                 prediccion_24h = min(100, max(0, round(prediccion[0])))
-                print(f"🤖 Predicción ML: {prediccion_24h}%")
+                print(f" Predicción ML: {prediccion_24h}%")
                 
             except Exception as e:
-                print(f"❌ Error en predicción ML: {e}")
+                print(f" Error en predicción ML: {e}")
                 prediccion_24h = min(100, ocupacion_uci + 5)
         else:
             prediccion_24h = min(100, ocupacion_uci + 8)
@@ -141,11 +141,11 @@ def obtener_metricas_reales(hospital_id):
             'ocupacion_areas': [ocupacion_uci, 65, 58]  # UCI, Urgencias, Hospitalización
         }
         
-        print(f"📈 Métricas calculadas: UCI={ocupacion_uci}%, Predicción={prediccion_24h}%")
+        print(f" Métricas calculadas: UCI={ocupacion_uci}%, Predicción={prediccion_24h}%")
         return metricas
         
     except Exception as e:
-        print(f"❌ Error obteniendo métricas: {e}")
+        print(f" Error obteniendo métricas: {e}")
         return None
     finally:
         conn.close()
@@ -167,7 +167,7 @@ def login():
         id_hospital = request.form.get('id_hospital')
         password = request.form.get('password')
         
-        print(f"🔐 Intento de login: ID={id_hospital}")
+        print(f" Intento de login: ID={id_hospital}")
         
         conn = get_db_connection()
         if conn:
@@ -191,21 +191,21 @@ def login():
                         if nombre_result:
                             hospital_nombre = nombre_result[0]
                     except Exception as nombre_error:
-                        print(f"⚠️  Error obteniendo nombre: {nombre_error}")
+                        print(f" Error obteniendo nombre: {nombre_error}")
                     
                     session['hospital_id'] = hospital_id
                     session['hospital_nombre'] = hospital_nombre
                     session['logged_in'] = True
                     conn.close()
-                    print(f"✅ Login exitoso: {hospital_nombre}")
+                    print(f" Login exitoso: {hospital_nombre}")
                     return redirect(url_for('dashboard'))
                 else:
                     flash('ID de hospital o contraseña incorrectos', 'error')
-                    print("❌ Login fallido: credenciales incorrectas")
+                    print(" Login fallido: credenciales incorrectas")
                     
             except Exception as e:
                 flash('Error en el sistema de autenticación', 'error')
-                print(f"❌ Error en login: {e}")
+                print(f" Error en login: {e}")
             finally:
                 try:
                     conn.close()
@@ -213,7 +213,7 @@ def login():
                     pass
         else:
             flash('Error conectando a la base de datos', 'error')
-            print("❌ No se pudo conectar a la BD")
+            print(" No se pudo conectar a la BD")
     
     return render_template('login.html')
 
@@ -229,7 +229,7 @@ def logout():
 def dashboard():
     hospital_id = session['hospital_id']
     
-    print(f"📊 Obteniendo métricas REALES para hospital {hospital_id}")
+    print(f" Obteniendo métricas REALES para hospital {hospital_id}")
     
     # Obtener métricas REALES desde BD
     metricas = obtener_metricas_reales(hospital_id)
@@ -245,9 +245,9 @@ def dashboard():
             'ocupacion_areas': [76, 65, 58]
         }
         flash('Usando datos de demostración - Verifique conexión a BD', 'warning')
-        print("⚠️  Usando datos de demostración")
+        print("  Usando datos de demostración")
     else:
-        print("✅ Mostrando datos REALES de BD")
+        print(" Mostrando datos REALES de BD")
     
     # Alertas basadas en métricas reales
     alertas = []
@@ -271,7 +271,7 @@ def dashboard():
 def predictions():
     hospital_id = session['hospital_id']
     
-    print(f"🤖 Obteniendo predicciones para hospital {hospital_id}")
+    print(f" Obteniendo predicciones para hospital {hospital_id}")
     
     # Obtener métricas REALES para predicciones
     metricas = obtener_metricas_reales(hospital_id)
@@ -282,7 +282,7 @@ def predictions():
             'ocupacion_uci': 76,
             'prediccion_24h': 92
         }
-        print("⚠️  Usando datos de demostración para predicciones")
+        print("  Usando datos de demostración para predicciones")
     
     # Determinar nivel de riesgo
     if metricas['prediccion_24h'] >= 80:
@@ -450,15 +450,15 @@ def guardar_datos():
             conn.commit()
             conn.close()
             
-            flash('✅ Datos guardados exitosamente', 'success')
-            print(f"✅ Datos guardados para hospital {hospital_id}, fecha {fecha}")
+            flash(' Datos guardados exitosamente', 'success')
+            print(f" Datos guardados para hospital {hospital_id}, fecha {fecha}")
             
         else:
-            flash('❌ Error conectando a la base de datos', 'error')
+            flash(' Error conectando a la base de datos', 'error')
             
     except Exception as e:
-        flash(f'❌ Error guardando datos: {str(e)}', 'error')
-        print(f"❌ Error guardando datos: {e}")
+        flash(f' Error guardando datos: {str(e)}', 'error')
+        print(f" Error guardando datos: {e}")
     
     return redirect(url_for('formulario_datos'))
 
@@ -477,6 +477,14 @@ def acerca_de():
     return render_template('acerca_de.html',
                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"))
+    
+@app.route("/configuracion")
+def configuracion():
+    fecha_actual = datetime.now().strftime("%d/%m/%Y")
+    return render_template("configuracion.html", 
+                           fecha_actual=fecha_actual,
+                           hospital_nombre="Hospital General")
+
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

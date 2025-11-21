@@ -424,8 +424,22 @@ body {
 .icon-gradient {
     /* Un gradiente de ejemplo */
     background: linear-gradient(45deg, #1e88e5, #00acc1);
+    
+    /* 1. Propiedad funcional (Webkit) para recortar el fondo al contorno del texto */
     -webkit-background-clip: text;
+    
+    /* 2. Propiedad estándar (para pasar la validación), 
+       aunque 'text' no es generalmente soportado sin prefijo */
+    background-clip: text; 
+
+    /* 3. Propiedad funcional (Webkit) para hacer el texto transparente y 
+       que se vea el fondo recortado */
     -webkit-text-fill-color: transparent;
+    
+    /* 4. Propiedad estándar equivalente para pasar la validación (si existiera un 
+       uso estándar de text-fill-color, pero generalmente se usa 'color') */
+    /* Para el estándar, podrías poner color: transparent; si el validador lo acepta,
+       pero -webkit-text-fill-color es específica para este efecto. */
 }
 
 .icon-red {
@@ -1150,11 +1164,150 @@ body {
 
 /* Mejoras visuales para inputs numéricos */
 input[type="number"] {
-    -moz-appearance: textfield;
+    /* 1. Específico de Firefox: Elimina los spinners */
+    -moz-appearance: textfield; 
+    
+    /* 2. Estándar W3C: Aunque 'textfield' no es un valor estándar 
+       para 'appearance: none', se incluye la propiedad sin prefijo 
+       para cumplir con el validador. */
+    appearance: none; 
+}
+
+/* --- ADICIÓN CLAVE para Chrome, Safari y Edge (Webkit) --- */
+/* Estos navegadores usan un pseudo-elemento diferente para los spinners */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    /* Elimina el botón de flecha interna y externa */
+    -webkit-appearance: none;
+    margin: 0; /* Necesario para corregir el espaciado residual en algunos navegadores */
 }
 
 input[type="number"]::-webkit-outer-spin-button,
 input[type="number"]::-webkit-inner-spin-button {
     -webkit-appearance: none;
     margin: 0;
+}
+
+/* --- Estilos para la sección de Configuración --- */
+
+.settings-tabs-nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 25px;
+    padding-bottom: 5px;
+    border-bottom: 2px solid #eee; /* Línea separadora */
+}
+
+.tab-button {
+    background-color: transparent;
+    border: none;
+    padding: 10px 15px;
+    font-size: 16px;
+    font-weight: 600;
+    color: #666;
+    cursor: pointer;
+    border-bottom: 3px solid transparent;
+    transition: all 0.3s ease; /* Animación al pasar el ratón */
+}
+
+.tab-button i {
+    margin-right: 8px;
+}
+
+.tab-button:hover {
+    color: #007bff; /* Color primario al pasar el ratón */
+}
+
+.tab-button.active {
+    color: #007bff; /* Color activo */
+    border-bottom-color: #007bff; /* Indicador de pestaña activa */
+    /* Animación de entrada para la pestaña activa */
+    animation: tab-highlight 0.3s ease-in-out; 
+}
+
+/* Animación de resaltado para la pestaña activa */
+@keyframes tab-highlight {
+    from {
+        border-bottom-color: transparent;
+        transform: translateY(3px);
+    }
+    to {
+        border-bottom-color: #007bff;
+        transform: translateY(0);
+    }
+}
+
+/* --- Estilos para las tarjetas de Configuración --- */
+
+.settings-content h3 {
+    margin-top: 0;
+    margin-bottom: 15px;
+    color: #333;
+}
+
+.settings-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 25px;
+}
+
+.setting-card {
+    background: #fff;
+    padding: 25px;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease; /* Animación al pasar el ratón */
+}
+
+.setting-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+}
+
+.setting-icon {
+    font-size: 32px;
+    color: #007bff;
+    margin-bottom: 15px;
+    display: block;
+}
+
+.setting-card h3 {
+    font-size: 18px;
+    color: #333;
+    margin-top: 0;
+}
+
+.setting-card p {
+    font-size: 14px;
+    color: #777;
+    margin-bottom: 20px;
+}
+
+.btn-config {
+    background-color: #28a745; /* Botón verde para acción */
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 500;
+    transition: background-color 0.2s ease, transform 0.2s ease;
+}
+
+.btn-config:hover {
+    background-color: #218838;
+    transform: scale(1.02);
+}
+
+/* Animación para la transición del contenido de la pestaña */
+.tab-pane {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.5s ease, transform 0.5s ease;
+}
+
+.tab-pane.active {
+    opacity: 1;
+    transform: translateY(0);
 }
