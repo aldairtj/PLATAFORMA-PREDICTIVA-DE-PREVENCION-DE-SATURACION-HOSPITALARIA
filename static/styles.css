@@ -36,10 +36,10 @@ body {
     width: 250px;
     background-color: var(--color-sidebar);
     border-right: 1px solid var(--color-separator);
-    padding: 20px 0 0 0; /* Ajustado padding inferior para footer */
+    padding: 20px 0 0 0;
     flex-shrink: 0;
     display: flex;
-    flex-direction: column; /* Para empujar el footer abajo */
+    flex-direction: column;
 }
 
 .sidebar-header {
@@ -69,10 +69,10 @@ body {
 }
 
 .nav-item a {
-    color: inherit; /* Hereda el color del padre .nav-item */
+    color: inherit;
     text-decoration: none;
     display: flex;
-    align-items: center; /* Para alinear icono y texto */
+    align-items: center;
     width: 100%;
     height: 100%;
 }
@@ -89,12 +89,12 @@ body {
 }
 
 .nav-item.active a {
-    color: var(--color-primary); /* Asegura que el texto activo sea azul */
+    color: var(--color-primary);
 }
 
-/* --- Sidebar Footer (Nueva adición) --- */
+/* Sidebar Footer */
 .sidebar-footer {
-    margin-top: auto; /* Empuja el footer hacia abajo */
+    margin-top: auto;
     padding: 15px 20px;
     border-top: 1px solid var(--color-separator);
     color: var(--color-text-light);
@@ -112,7 +112,6 @@ body {
 .sidebar-footer:hover {
     background-color: #f5f5f5;
 }
-
 
 /* 2. Contenido Principal y Header */
 .main-content {
@@ -237,7 +236,7 @@ body {
     color: #fff;
 }
 
-/* Secciones de Gráficas y Alturas (Corregido) */
+/* Secciones de Gráficas - ALTURAS MEJORADAS */
 .chart-section-wrapper {
     display: flex;
     gap: 20px;
@@ -250,38 +249,28 @@ body {
     border-radius: 8px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
     flex: 1;
-    /* ALTURA CORREGIDA para evitar crecimiento infinito */
-    height: 300px; 
+    height: 400px;
     display: flex;
     flex-direction: column;
+    min-height: 400px;
 }
-
-/* Alturas específicas para las gráficas de Predicciones */
-.chart-prediction-uci, .chart-comparative {
-    height: 350px; 
-}
-
 
 .chart-box h3 {
     font-size: 1.2rem;
     font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.chart-placeholder {
-    height: 200px;
-    border: 1px dashed var(--color-separator);
+    margin-bottom: 20px;
+    color: var(--color-text-dark);
+    line-height: 1.4;
+    height: auto;
+    min-height: 50px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    color: var(--color-text-light);
-    font-size: 0.9rem;
-    margin-bottom: 10px;
 }
 
 .chart-box canvas {
-    flex-grow: 1; 
-    max-height: 100%; /* Asegura que no desborde el contenedor */
+    flex-grow: 1;
+    max-height: 250px;
+    min-height: 220px;
 }
 
 .x-axis-labels {
@@ -290,32 +279,59 @@ body {
     display: flex;
     justify-content: space-around;
     padding: 0 20px;
+    margin-top: 15px;
 }
 
 .legend {
     font-size: 0.8rem;
-    text-align: right;
-    margin-top: 10px;
+    text-align: center;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-separator);
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .dot {
     display: inline-block;
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin-right: 5px;
+    margin-right: 8px;
 }
-.uci-dot { background-color: var(--color-primary); }
 
-.legend-bar-chart {
+.uci-dot { background-color: #1e88e5; }
+
+/* Nueva leyenda para gráfica de comparación de hospitales */
+.legend-comparison {
     font-size: 0.8rem;
-    text-align: right;
-    margin-top: 10px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid var(--color-separator);
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+    height: auto;
+    min-height: 50px;
+    align-items: center;
 }
 
-.central-dot { background-color: #3f51b5; /* Azul más oscuro */ }
-.este-dot { background-color: #ffc107; /* Amarillo */ }
-.norte-dot { background-color: #4caf50; /* Verde */ }
+.legend-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 5px;
+    white-space: nowrap;
+}
+
+/* Colores para los puntos de la nueva gráfica de hospitales */
+.hospital-dot-1 { background-color: #3f51b5; }
+.hospital-dot-2 { background-color: #4caf50; }
+.hospital-dot-3 { background-color: #ff9800; }
+.hospital-dot-4 { background-color: #9c27b0; }
+.hospital-dot-5 { background-color: #f44336; }
 
 /* Alertas Recientes */
 .alerts-title {
@@ -377,472 +393,6 @@ body {
     background-color: rgba(255, 193, 7, 0.1);
     color: var(--color-alert-yellow);
 }
-
-
-/* --- Estilos para la página de Predicciones --- */
-.prediction-summary-cards {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr); /* 3 columnas */
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.prediction-card {
-    display: flex;
-    align-items: center;
-    padding: 20px;
-    background-color: var(--color-sidebar);
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.prediction-card i {
-    font-size: 2.5rem;
-    margin-right: 15px;
-}
-
-.prediction-card .card-content {
-    flex-grow: 1;
-}
-
-.prediction-card .card-label {
-    font-size: 0.85rem;
-    color: var(--color-text-light);
-}
-
-.prediction-card .card-value {
-    font-size: 1.5rem;
-    font-weight: bold;
-    color: var(--color-text-dark);
-}
-
-.prediction-card .card-value span {
-    font-size: 1.2rem; /* Para la flecha */
-}
-
-
-.icon-gradient {
-    /* Un gradiente de ejemplo */
-    background: linear-gradient(45deg, #1e88e5, #00acc1);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-}
-
-.icon-red {
-    color: var(--color-alert-red);
-}
-
-.alert-status-card {
-    border-left: 5px solid var(--color-alert-red);
-}
-
-/* Leyendas de Predicción */
-.legend-prediction-uci, .legend-comparative {
-    text-align: center;
-    margin-top: 15px;
-    font-size: 0.85rem;
-}
-
-.actual-dot { background-color: #1e88e5; } /* Azul para actual */
-.prediction-dot {
-    background-color: #ffc107; /* Amarillo para predicción */
-    border: 1px dashed #ffc107; /* Para simular la línea punteada */
-}
-
-/* Predicciones por Hospital (Grid) */
-.hospital-prediction-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr); /* 2 columnas */
-    gap: 20px;
-    margin-bottom: 30px;
-}
-
-.hospital-card {
-    background-color: var(--color-sidebar);
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    position: relative;
-    border-left: 5px solid; /* Para el borde de color de estado */
-}
-
-.hospital-card h4 {
-    font-size: 1.1rem;
-    margin-bottom: 10px;
-    font-weight: 600;
-}
-
-.hospital-card .status-label {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    font-size: 0.7rem;
-    padding: 4px 10px;
-    border-radius: 15px;
-    font-weight: 600;
-    color: #fff;
-}
-
-.hospital-card p {
-    font-size: 0.9rem;
-    color: var(--color-text-dark);
-    line-height: 1.6;
-}
-
-.hospital-card .value-highlight {
-    font-weight: bold;
-}
-
-.hospital-card .risk-level {
-    font-weight: 600;
-    padding: 2px 8px;
-    border-radius: 4px;
-    font-size: 0.8rem;
-}
-
-/* Colores de estado para las tarjetas de hospital */
-.hospital-card.saturated { border-left-color: var(--color-alert-red); }
-.hospital-card.saturated .status-label { background-color: var(--color-alert-red); }
-.hospital-card.alert { border-left-color: var(--color-alert-yellow); }
-.hospital-card.alert .status-label { background-color: var(--color-alert-yellow); }
-.hospital-card.normal { border-left-color: var(--color-normal-green); }
-.hospital-card.normal .status-label { background-color: var(--color-normal-green); }
-
-
-/* Colores de riesgo */
-.risk-level.critical {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: var(--color-alert-red);
-}
-.risk-level.moderate {
-    background-color: rgba(255, 193, 7, 0.1);
-    color: var(--color-alert-yellow);
-}
-.risk-level.low {
-    background-color: rgba(40, 167, 69, 0.1);
-    color: var(--color-normal-green);
-}
-
-
-.btn-details {
-    background-color: var(--color-primary);
-    color: #fff;
-    border: none;
-    padding: 8px 15px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 15px;
-    font-size: 0.85rem;
-    transition: background-color 0.2s ease;
-}
-
-.btn-details:hover {
-    background-color: #1a76c6;
-}
-
-/* Gráfica Comparativa - Leyenda */
-.actual-bar-dot { background-color: #28a745; } /* Verde para Actual % */
-.prediction-bar-dot { background-color: #1e88e5; } /* Azul para Predicción 24h % */
-
-/* --- Estilos para la Gestión Operativa --- */
-
-/* Contenedor de las Tarjetas de Acción (Grid de 3) */
-.action-cards-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-bottom: 40px;
-}
-
-.action-card {
-    background-color: var(--color-sidebar);
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    min-height: 250px;
-}
-
-.action-card i {
-    font-size: 3rem;
-    margin-bottom: 20px;
-    /* Ajustes visuales para simular los iconos de la imagen */
-    padding: 15px;
-    border-radius: 12px;
-}
-
-/* Colores de iconos basados en la imagen */
-.icon-blue-light {
-    color: #4CAF50; /* Verde, para Reasignar Camas */
-    background-color: rgba(76, 175, 80, 0.1);
-}
-.icon-purple {
-    color: #9c27b0; /* Púrpura, para Trasladar Pacientes */
-    background-color: rgba(156, 39, 176, 0.1);
-}
-.icon-green-light {
-    color: var(--color-primary); /* Azul, para Solicitar Recursos */
-    background-color: rgba(30, 136, 229, 0.1);
-}
-
-.action-card h3 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-}
-
-.action-card p {
-    color: var(--color-text-light);
-    font-size: 0.9rem;
-    flex-grow: 1; /* Empuja el botón hacia abajo */
-}
-
-.btn-action {
-    background-color: var(--color-primary);
-    color: #fff;
-    border: none;
-    padding: 10px 25px;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 20px;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: background-color 0.2s ease;
-}
-
-.btn-action:hover {
-    background-color: #1a76c6;
-}
-
-/* Acciones Recientes */
-.recent-actions-section {
-    background-color: var(--color-sidebar);
-    padding: 25px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-}
-
-.actions-list {
-    list-style: none;
-    padding-left: 0;
-}
-
-.action-item {
-    display: flex;
-    align-items: center;
-    padding: 12px 0;
-    border-bottom: 1px solid var(--color-separator);
-}
-
-.action-item:last-child {
-    border-bottom: none;
-}
-
-.action-icon {
-    font-size: 1.2rem;
-    color: var(--color-primary); /* Icono de círculo/check */
-    margin-right: 15px;
-}
-
-.action-text {
-    flex-grow: 1;
-    font-size: 0.95rem;
-    font-weight: 500;
-}
-
-.action-details {
-    color: var(--color-text-light);
-    font-size: 0.85rem;
-    width: 200px; /* Ancho fijo para alinear detalles */
-    text-align: right;
-}
-
-.status {
-    font-size: 0.75rem;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 15px;
-    margin-right: 20px;
-    text-transform: uppercase;
-}
-
-.status.completed {
-    background-color: rgba(40, 167, 69, 0.1); /* Verde claro */
-    color: var(--color-normal-green);
-}
-
-.status.in-progress {
-    background-color: rgba(255, 193, 7, 0.1); /* Amarillo claro */
-    color: var(--color-alert-yellow);
-}
-
-/* Opcional: reemplazar los iconos de círculo por checks si están "Completados" */
-/* Esto requeriría JS para cambiar la clase del icono, o usar un truco CSS */
-/* Usamos el far fa-circle (contorno) para la simulación */
-
-/* --- Estilos para la página "Acerca de" --- */
-
-.about-page {
-    max-width: 1000px; /* Ancho máximo para el contenido principal */
-    margin: 0 auto; /* Centrar el contenido */
-    padding-top: 20px;
-}
-
-.about-hero {
-    text-align: center;
-    margin-bottom: 40px;
-}
-
-.about-logo {
-    width: 100px; /* Ajusta el tamaño del logo */
-    height: 100px;
-    margin-bottom: 20px;
-}
-
-.about-intro-text {
-    font-size: 1.1rem;
-    color: var(--color-text-dark);
-    line-height: 1.6;
-    max-width: 700px;
-    margin: 0 auto;
-}
-
-.about-section {
-    background-color: var(--color-sidebar);
-    padding: 30px;
-    border-radius: 8px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
-    margin-bottom: 30px;
-}
-
-.about-section h2 {
-    font-size: 1.4rem;
-    font-weight: 600;
-    color: var(--color-primary);
-    margin-bottom: 20px;
-    text-align: center;
-}
-
-.about-section p {
-    font-size: 0.95rem;
-    line-height: 1.6;
-    color: var(--color-text-light);
-    margin-bottom: 15px;
-}
-
-/* Características Principales (Grid) */
-.features-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.feature-card {
-    background-color: #f9f9f9; /* Fondo ligeramente diferente para destacar */
-    padding: 20px;
-    border-radius: 8px;
-    text-align: center;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
-}
-
-.feature-card i {
-    font-size: 2.5rem;
-    margin-bottom: 15px;
-    /* icon-gradient ya definido, se reutiliza */
-}
-
-.feature-card h4 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: var(--color-text-dark);
-}
-
-.feature-card p {
-    font-size: 0.85rem;
-    color: var(--color-text-light);
-    line-height: 1.5;
-}
-
-/* Sección Tecnología (Grid) */
-.technology-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 20px;
-    margin-top: 20px;
-}
-
-.tech-card {
-    background-color: #f9f9f9;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
-}
-
-.tech-card h4 {
-    font-size: 1.05rem;
-    font-weight: 600;
-    margin-bottom: 10px;
-    color: var(--color-primary);
-}
-
-.tech-card p {
-    font-size: 0.85rem;
-    color: var(--color-text-light);
-    line-height: 1.5;
-}
-
-/* Caja de Impacto Social */
-.social-impact-box {
-    background: linear-gradient(45deg, var(--color-primary), var(--color-alert-blue)); /* Gradiente de azul */
-    color: #fff;
-    padding: 30px;
-    border-radius: 8px;
-    text-align: center;
-    margin-bottom: 30px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.social-impact-box h3 {
-    font-size: 1.6rem;
-    font-weight: 600;
-    margin-bottom: 15px;
-}
-
-.social-impact-box p {
-    font-size: 1rem;
-    line-height: 1.7;
-    margin-bottom: 25px;
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
-}
-
-.social-impact-box .btn-primary {
-    background-color: #fff;
-    color: var(--color-primary);
-    border: none;
-    padding: 12px 30px;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 1rem;
-    font-weight: 600;
-    transition: background-color 0.2s ease, color 0.2s ease;
-}
-
-.social-impact-box .btn-primary:hover {
-    background-color: #e3f2fd;
-    color: #1a76c6;
-}
-
-
-
-
-
 
 /* Estilos para página de Login */
 .login-body {
@@ -1132,8 +682,537 @@ body {
     border: 1px solid #ffeaa7;
 }
 
+/* ===== ESTILOS ESPECÍFICOS PARA ACERCA DE ===== */
+.about-page {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding-top: 20px;
+}
+
+.about-hero {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.about-logo {
+    width: 100px;
+    height: 100px;
+    margin-bottom: 20px;
+}
+
+.about-intro-text {
+    font-size: 1.1rem;
+    color: var(--color-text-dark);
+    line-height: 1.6;
+    max-width: 700px;
+    margin: 0 auto;
+}
+
+.about-section {
+    background-color: var(--color-sidebar);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.about-section h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+    color: var(--color-primary);
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.about-section p {
+    font-size: 0.95rem;
+    line-height: 1.6;
+    color: var(--color-text-light);
+    margin-bottom: 15px;
+}
+
+/* Características Principales (Grid) */
+.features-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.feature-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    text-align: center;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
+}
+
+.feature-card i {
+    font-size: 2.5rem;
+    margin-bottom: 15px;
+}
+
+.feature-card h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--color-text-dark);
+}
+
+.feature-card p {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    line-height: 1.5;
+}
+
+/* Sección Tecnología (Grid) */
+.technology-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-top: 20px;
+}
+
+.tech-card {
+    background-color: #f9f9f9;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.03);
+}
+
+.tech-card h4 {
+    font-size: 1.05rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+    color: var(--color-primary);
+}
+
+.tech-card p {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+    line-height: 1.5;
+}
+
+/* Caja de Impacto Social */
+.social-impact-box {
+    background: linear-gradient(45deg, var(--color-primary), var(--color-alert-blue));
+    color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    text-align: center;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.social-impact-box h3 {
+    font-size: 1.6rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+}
+
+.social-impact-box p {
+    font-size: 1rem;
+    line-height: 1.7;
+    margin-bottom: 25px;
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.social-impact-box .btn-primary {
+    background-color: #fff;
+    color: var(--color-primary);
+    border: none;
+    padding: 12px 30px;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 1rem;
+    font-weight: 600;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+.social-impact-box .btn-primary:hover {
+    background-color: #e3f2fd;
+    color: #1a76c6;
+}
+
+/* Gradientes para iconos */
+.icon-gradient {
+    background: linear-gradient(45deg, var(--color-primary), #00acc1);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA PREDICCIONES ===== */
+.prediction-summary-cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.prediction-card {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    background-color: var(--color-sidebar);
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.prediction-card i {
+    font-size: 2.5rem;
+    margin-right: 15px;
+}
+
+.prediction-card .card-content {
+    flex-grow: 1;
+}
+
+.prediction-card .card-label {
+    font-size: 0.85rem;
+    color: var(--color-text-light);
+}
+
+.prediction-card .card-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: var(--color-text-dark);
+}
+
+.prediction-card .card-value span {
+    font-size: 1.2rem;
+}
+
+.icon-red {
+    color: var(--color-alert-red);
+}
+
+.alert-status-card {
+    border-left: 5px solid var(--color-alert-red);
+}
+
+/* Gráficas de predicciones */
+.chart-prediction-uci, .chart-comparative {
+    height: 350px;
+    background-color: var(--color-sidebar);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    margin-bottom: 30px;
+}
+
+.chart-prediction-uci h3, .chart-comparative h3 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-bottom: 15px;
+    color: var(--color-text-dark);
+}
+
+.chart-prediction-uci canvas, .chart-comparative canvas {
+    flex-grow: 1;
+    max-height: 220px;
+}
+
+.legend-prediction-uci, .legend-comparative {
+    text-align: center;
+    margin-top: 15px;
+    font-size: 0.85rem;
+}
+
+.actual-dot { 
+    background-color: #1e88e5; 
+}
+
+.prediction-dot {
+    background-color: #ffc107;
+}
+
+.actual-bar-dot { 
+    background-color: #28a745; 
+}
+
+.prediction-bar-dot { 
+    background-color: #1e88e5; 
+}
+
+/* Predicciones por Hospital */
+.hospital-prediction-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+    margin-bottom: 30px;
+}
+
+.hospital-card {
+    background-color: var(--color-sidebar);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    position: relative;
+    border-left: 5px solid;
+}
+
+.hospital-card h4 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.hospital-card .status-label {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    font-size: 0.7rem;
+    padding: 4px 10px;
+    border-radius: 15px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.hospital-card p {
+    font-size: 0.9rem;
+    color: var(--color-text-dark);
+    line-height: 1.6;
+}
+
+.hospital-card .value-highlight {
+    font-weight: bold;
+}
+
+.hospital-card .risk-level {
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+/* Colores de estado para las tarjetas de hospital */
+.hospital-card.saturated { 
+    border-left-color: var(--color-alert-red); 
+}
+
+.hospital-card.saturated .status-label { 
+    background-color: var(--color-alert-red); 
+}
+
+.hospital-card.alert { 
+    border-left-color: var(--color-alert-yellow); 
+}
+
+.hospital-card.alert .status-label { 
+    background-color: var(--color-alert-yellow); 
+}
+
+.hospital-card.normal { 
+    border-left-color: var(--color-normal-green); 
+}
+
+.hospital-card.normal .status-label { 
+    background-color: var(--color-normal-green); 
+}
+
+/* Colores de riesgo */
+.risk-level.critical {
+    background-color: rgba(220, 53, 69, 0.1);
+    color: var(--color-alert-red);
+}
+
+.risk-level.moderate {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--color-alert-yellow);
+}
+
+.risk-level.low {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--color-normal-green);
+}
+
+.btn-details {
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 15px;
+    font-size: 0.85rem;
+    transition: background-color 0.2s ease;
+}
+
+.btn-details:hover {
+    background-color: #1a76c6;
+}
+
+/* ===== ESTILOS ESPECÍFICOS PARA GESTIÓN OPERATIVA ===== */
+.action-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-bottom: 40px;
+}
+
+.action-card {
+    background-color: var(--color-sidebar);
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    min-height: 250px;
+}
+
+.action-card i {
+    font-size: 3rem;
+    margin-bottom: 20px;
+    padding: 15px;
+    border-radius: 12px;
+}
+
+/* Colores de iconos */
+.icon-blue-light {
+    color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+.icon-purple {
+    color: #9c27b0;
+    background-color: rgba(156, 39, 176, 0.1);
+}
+
+.icon-green-light {
+    color: var(--color-primary);
+    background-color: rgba(30, 136, 229, 0.1);
+}
+
+.action-card h3 {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.action-card p {
+    color: var(--color-text-light);
+    font-size: 0.9rem;
+    flex-grow: 1;
+}
+
+.btn-action {
+    background-color: var(--color-primary);
+    color: #fff;
+    border: none;
+    padding: 10px 25px;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 20px;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: background-color 0.2s ease;
+}
+
+.btn-action:hover {
+    background-color: #1a76c6;
+}
+
+/* Acciones Recientes */
+.recent-actions-section {
+    background-color: var(--color-sidebar);
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+}
+
+.actions-list {
+    list-style: none;
+    padding-left: 0;
+}
+
+.action-item {
+    display: flex;
+    align-items: center;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--color-separator);
+}
+
+.action-item:last-child {
+    border-bottom: none;
+}
+
+.action-icon {
+    font-size: 1.2rem;
+    color: var(--color-primary);
+    margin-right: 15px;
+}
+
+.action-text {
+    flex-grow: 1;
+    font-size: 0.95rem;
+    font-weight: 500;
+}
+
+.action-details {
+    color: var(--color-text-light);
+    font-size: 0.85rem;
+    width: 200px;
+    text-align: right;
+}
+
+.status {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: 15px;
+    margin-right: 20px;
+    text-transform: uppercase;
+}
+
+.status.completed {
+    background-color: rgba(40, 167, 69, 0.1);
+    color: var(--color-normal-green);
+}
+
+.status.in-progress {
+    background-color: rgba(255, 193, 7, 0.1);
+    color: var(--color-alert-yellow);
+}
+
 /* Responsive */
+@media (max-width: 1200px) {
+    .chart-section-wrapper {
+        flex-direction: column;
+    }
+    
+    .chart-box {
+        height: 380px;
+    }
+    
+    .summary-cards {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
 @media (max-width: 768px) {
+    .summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .dashboard-body {
+        padding: 20px;
+    }
+    
+    .top-header {
+        padding: 15px 20px;
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    .sidebar {
+        width: 200px;
+    }
+    
     .form-grid-3,
     .form-grid-2 {
         grid-template-columns: 1fr;
@@ -1145,6 +1224,59 @@ body {
     
     .form-section-card {
         padding: 20px;
+    }
+    
+    .features-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .technology-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .about-section {
+        padding: 20px;
+    }
+    
+    .about-page {
+        padding: 15px;
+    }
+    
+    .prediction-summary-cards {
+        grid-template-columns: 1fr;
+    }
+    
+    .hospital-prediction-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .chart-prediction-uci, .chart-comparative {
+        height: 300px;
+    }
+    
+    .action-cards-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .action-card {
+        padding: 20px;
+        min-height: 200px;
+    }
+    
+    .action-details {
+        width: auto;
+        text-align: left;
+        margin-top: 5px;
+    }
+    
+    .action-item {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .status {
+        margin-right: 0;
+        margin-top: 5px;
     }
 }
 

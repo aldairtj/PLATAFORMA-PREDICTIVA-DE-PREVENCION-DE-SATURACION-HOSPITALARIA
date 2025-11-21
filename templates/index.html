@@ -114,13 +114,17 @@
                         <div class="legend"><span class="dot uci-dot"></span> Ocupación %</div>
                     </div>
                     
-                    <div class="chart-box chart-hospital-occupancy">
-                        <h3>Ocupación por Área - Actual</h3>
-                        <canvas id="hospitalOccupancyChart"></canvas>
-                        <div class="legend-bar-chart">
-                            <span class="dot central-dot"></span> UCI
-                            <span class="dot este-dot"></span> Urgencias
-                            <span class="dot norte-dot"></span> Hospitalización
+                    <!-- Nueva gráfica: Ocupación Actual - Otros Hospitales -->
+                    <div class="chart-box chart-hospital-comparison">
+                        <h3>Ocupación Actual - Hospitales de la Red</h3>
+                        <canvas id="hospitalComparisonChart"></canvas>
+                        <div class="legend-comparison">
+                            {% for hospital in otros_hospitales %}
+                            <div class="legend-item">
+                                <span class="dot hospital-dot-{{ hospital.id }}"></span>
+                                {{ hospital.nombre }}
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>
@@ -142,9 +146,9 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Gráfica de Evolución UCI (existente)
             const uciDataDashboard = {
                 labels: ["Lun", "Mar", "Mié", "Jue", "Vie"],
                 datasets: [{
@@ -160,19 +164,33 @@
                 }]
             };
 
-            const hospitalDataDashboard = {
-                labels: ["UCI", "Urgencias", "Hospitalización"],
+            // Nueva gráfica: Comparación de Hospitales - DATOS REALES
+            const hospitalComparisonData = {
+                labels: {{ otros_hospitales | map(attribute='nombre') | list | tojson }},
                 datasets: [{
-                    label: 'Ocupación %',
-                    data: {{ metricas.ocupacion_areas | tojson }},
-                    backgroundColor: ["#3f51b5", "#ffc107", "#4caf50"],
-                    borderColor: ["#3f51b5", "#ffc107", "#4caf50"],
-                    borderWidth: 1,
+                    label: 'Ocupación UCI %',
+                    data: {{ otros_hospitales | map(attribute='ocupacion_uci') | list | tojson }},
+                    backgroundColor: [
+                        '#3f51b5', // Hospital 1 - Azul
+                        '#4caf50', // Hospital 2 - Verde  
+                        '#ff9800', // Hospital 3 - Naranja
+                        '#9c27b0'  // Hospital 4 - Púrpura
+                    ],
+                    borderColor: [
+                        '#3f51b5',
+                        '#4caf50',
+                        '#ff9800', 
+                        '#9c27b0'
+                    ],
+                    borderWidth: 2,
                     barPercentage: 0.7,
                     categoryPercentage: 0.8
                 }]
             };
 
+            console.log('Datos para gráfica de comparación:', hospitalComparisonData);
+
+            // Configuración de la gráfica de Evolución UCI
             const uciChartElementDashboard = document.getElementById('uciEvolutionChart');
             if (uciChartElementDashboard) {
                 new Chart(uciChartElementDashboard, {
@@ -182,30 +200,57 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            y: { beginAtZero: false, max: 100, min: 0, ticks: { stepSize: 25 } },
-                            x: { grid: { display: false } }
+                            y: { 
+                                beginAtZero: true, 
+                                max: 100, 
+                                min: 0, 
+                                ticks: { stepSize: 25 },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: { 
+                                grid: { display: false }
+                            }
                         },
-                        plugins: { legend: { display: false }, title: { display: false } }
+                        plugins: { 
+                            legend: { display: false }
+                        }
                     }
                 });
             }
 
-            const hospitalChartElementDashboard = document.getElementById('hospitalOccupancyChart');
-            if (hospitalChartElementDashboard) {
-                new Chart(hospitalChartElementDashboard, {
+            // Configuración de la nueva gráfica de Comparación de Hospitales
+            const hospitalComparisonChartElement = document.getElementById('hospitalComparisonChart');
+            if (hospitalComparisonChartElement && hospitalComparisonData.labels.length > 0) {
+                new Chart(hospitalComparisonChartElement, {
                     type: 'bar',
-                    data: hospitalDataDashboard,
+                    data: hospitalComparisonData,
                     options: {
                         responsive: true,
                         maintainAspectRatio: false,
-                        indexAxis: 'x',
                         scales: {
-                            y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 25 } },
-                            x: { grid: { display: false } }
+                            y: { 
+                                beginAtZero: true, 
+                                max: 100, 
+                                min: 0, 
+                                ticks: { stepSize: 25 },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: { 
+                                grid: { display: false }
+                            }
                         },
-                        plugins: { legend: { display: false }, title: { display: false } }
+                        plugins: { 
+                            legend: { display: false }
+                        }
                     }
                 });
+                console.log('Gráfica de comparación creada exitosamente');
+            } else {
+                console.log('No se pudo crear la gráfica de comparación - elemento no encontrado o sin datos');
             }
         });
     </script>

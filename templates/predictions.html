@@ -26,7 +26,7 @@
                     </li>
                     <li class="nav-item">
                         <i class="fas fa-plus-circle"></i>
-                    <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
+                        <a href="{{ url_for('formulario_datos') }}"><span>Ingresar Datos</span></a>
                     </li>
                     <li class="nav-item">
                         <i class="fas fa-cogs"></i>
@@ -111,7 +111,7 @@
                         <p>Ocupación actual: {{ predicciones.ocupacion_actual }}%</p>
                         <p>Predicción 24h: <span class="value-highlight">{{ predicciones.prediccion_24h }}%</span></p>
                         <p>Predicción 48h: <span class="value-highlight">{{ predicciones.prediccion_48h }}%</span></p>
-                        <p>Nivel de riesgo: <span class="risk-level 
+                        <p>Nivel de riesgo: <span class="risk-level
                             {% if predicciones.nivel_riesgo == 'Crítico' %}critical
                             {% elif predicciones.nivel_riesgo == 'Moderado' %}moderate
                             {% else %}low{% endif %}">
@@ -124,7 +124,7 @@
                 <h2 class="section-sub-title">Comparativa con Otros Hospitales</h2>
                 <div class="hospital-prediction-grid">
                     {% for hospital in otros_hospitales %}
-                    <div class="hospital-card 
+                    <div class="hospital-card
                         {% if hospital.nivel_riesgo == 'Alto' %}saturated
                         {% elif hospital.nivel_riesgo == 'Moderado' %}alert
                         {% else %}normal{% endif %}">
@@ -135,7 +135,7 @@
                             {% else %}Normal{% endif %}
                         </div>
                         <p>Predicción 24h: <span class="value-highlight">{{ hospital.prediccion_24h }}%</span></p>
-                        <p>Nivel de riesgo: <span class="risk-level 
+                        <p>Nivel de riesgo: <span class="risk-level
                             {% if hospital.nivel_riesgo == 'Alto' %}critical
                             {% elif hospital.nivel_riesgo == 'Moderado' %}moderate
                             {% else %}low{% endif %}">
@@ -158,7 +158,6 @@
         </main>
     </div>
 
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Gráfica de Predicción UCI
@@ -193,7 +192,7 @@
                 ]
             };
 
-            // Gráfica Comparativa
+            // Gráfica Comparativa - DATOS REALES
             const comparativeData = {
                 labels: {{ datos_comparativa.labels | tojson }},
                 datasets: [
@@ -214,7 +213,9 @@
                 ]
             };
 
-            // Gráfica de Predicción UCI
+            console.log('Datos para gráfica comparativa:', comparativeData);
+
+            // Configuración de la gráfica de Predicción UCI
             const uciPredictionChartElement = document.getElementById('uciPredictionChart');
             if (uciPredictionChartElement) {
                 new Chart(uciPredictionChartElement, {
@@ -224,17 +225,32 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            y: { beginAtZero: false, max: 100, min: 0, ticks: { stepSize: 25 } },
-                            x: { grid: { display: true } }
+                            y: { 
+                                beginAtZero: false, 
+                                max: 100, 
+                                min: 0, 
+                                ticks: { stepSize: 25 },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: { 
+                                grid: { display: true }
+                            }
                         },
-                        plugins: { legend: { display: false }, title: { display: false } }
+                        plugins: { 
+                            legend: { 
+                                display: true,
+                                position: 'top'
+                            }
+                        }
                     }
                 });
             }
 
-            // Gráfica Comparativa
+            // Configuración de la Gráfica Comparativa
             const comparativeChartElement = document.getElementById('comparativeChart');
-            if (comparativeChartElement) {
+            if (comparativeChartElement && comparativeData.labels.length > 0) {
                 new Chart(comparativeChartElement, {
                     type: 'bar',
                     data: comparativeData,
@@ -242,12 +258,30 @@
                         responsive: true,
                         maintainAspectRatio: false,
                         scales: {
-                            y: { beginAtZero: true, max: 100, min: 0, ticks: { stepSize: 25 } },
-                            x: { grid: { display: false } }
+                            y: { 
+                                beginAtZero: true, 
+                                max: 100, 
+                                min: 0, 
+                                ticks: { stepSize: 25 },
+                                grid: {
+                                    drawBorder: false
+                                }
+                            },
+                            x: { 
+                                grid: { display: false }
+                            }
                         },
-                        plugins: { legend: { display: false }, title: { display: false } }
+                        plugins: { 
+                            legend: { 
+                                display: true,
+                                position: 'top'
+                            }
+                        }
                     }
                 });
+                console.log('Gráfica comparativa creada exitosamente');
+            } else {
+                console.log('No se pudo crear la gráfica comparativa - elemento no encontrado o sin datos');
             }
         });
     </script>

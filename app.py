@@ -8,29 +8,29 @@ from functools import wraps
 app = Flask(__name__)
 app.secret_key = 'clave_secreta_temporal_para_prototipo'
 
-# Configuración de la base de datos - CODIFICACIÓN CORREGIDA
+# Configuración de la base de datos
 def get_db_connection():
     try:
         directorio_actual = os.path.dirname(os.path.abspath(__file__))
         ruta_bd = os.path.join(directorio_actual, 'data', 'BASEH.fdb')
         
-        print(f"🔍 Buscando BD en: {ruta_bd}")
+        print(f"Buscando BD en: {ruta_bd}")
         
         if not os.path.exists(ruta_bd):
-            print("❌ ERROR: El archivo BASEH.FDB no existe")
+            print("ERROR: El archivo BASEH.FDB no existe")
             return None
             
         conn = firebirdsql.connect(
             host='localhost',
             database=ruta_bd,
-            user='SYSDBA', 
+            user='SYSDBA',
             password='masterkey',
             charset='ISO8859_1'
         )
-        print("✅ Conexión a BD exitosa")
+        print("Conexión a BD exitosa")
         return conn
     except Exception as e:
-        print(f"❌ Error conectando a BD: {e}")
+        print(f"Error conectando a BD: {e}")
         return None
 
 # Cargar modelo ML
@@ -40,30 +40,29 @@ def cargar_modelo_ml(hospital_id):
         modelo_path = os.path.join(directorio_actual, 'ml', 'modelos', f'hospital_{hospital_id}.pkl')
         
         if not os.path.exists(modelo_path):
-            print(f"❌ Modelo no encontrado: {modelo_path}")
+            print(f"Modelo no encontrado: {modelo_path}")
             return None
             
         with open(modelo_path, 'rb') as f:
             modelo = pickle.load(f)
-        print(f"✅ Modelo ML cargado para hospital {hospital_id}")
+        print(f"Modelo ML cargado para hospital {hospital_id}")
         return modelo
     except Exception as e:
-        print(f"❌ Error cargando modelo ML: {e}")
+        print(f"Error cargando modelo ML: {e}")
         return None
 
 # Obtener métricas REALES desde BD
 def obtener_metricas_reales(hospital_id):
     conn = get_db_connection()
     if not conn:
-        print("❌ No se pudo conectar a BD para métricas")
+        print("No se pudo conectar a BD para métricas")
         return None
         
     try:
         cur = conn.cursor()
         
-        # Obtener datos MÁS RECIENTES
         cur.execute("""
-            SELECT 
+            SELECT
                 ch.CAMAS_UCI_OCUPADAS,
                 ch.CAMAS_UCI_TOTALES,
                 ch.CAMAS_EMERGENCIA_OCUPADAS,
@@ -79,55 +78,50 @@ def obtener_metricas_reales(hospital_id):
         datos = cur.fetchone()
         
         if not datos:
-            print("❌ No se encontraron datos para el hospital")
+            print("No se encontraron datos para el hospital")
             return None
             
-        print(f"📊 Datos BD obtenidos: UCI={datos[0]}/{datos[1]}, Espera={datos[3]}, Total={datos[4]}")
+        print(f"Datos BD obtenidos: UCI={datos[0]}/{datos[1]}, Espera={datos[3]}, Total={datos[4]}")
         
-        # Calcular porcentajes
         ocupacion_uci = round((datos[0] / datos[1]) * 100) if datos[1] > 0 else 0
         pacientes_urgencias = datos[3]
         total_pacientes = datos[4]
         
-        # Obtener evolución semanal (últimos 5 días)
         cur.execute("""
-            SELECT CAMAS_UCI_OCUPADAS 
-            FROM CAPACIDAD_HOSPITAL 
-            WHERE ID_HOSPITAL = ? 
-            ORDER BY FECHA DESC 
+            SELECT CAMAS_UCI_OCUPADAS
+            FROM CAPACIDAD_HOSPITAL
+            WHERE ID_HOSPITAL = ?
+            ORDER BY FECHA DESC
             ROWS 5
         """, (hospital_id,))
         
         evolucion_data = [fila[0] for fila in cur.fetchall()]
-        # Rellenar si no hay suficientes datos
         while len(evolucion_data) < 5:
             evolucion_data.append(evolucion_data[-1] if evolucion_data else datos[0])
             
         evolucion_semanal = [round((camas / datos[1]) * 100) if datos[1] > 0 else 0 for camas in evolucion_data]
         
-        # Generar predicción con ML
         modelo = cargar_modelo_ml(hospital_id)
         prediccion_24h = 0
         
         if modelo:
             try:
-                # Preparar datos para predicción
                 datos_prediccion = [
-                    total_pacientes,      # TOTAL_PACIENTES
-                    datos[2],             # EMERGENCIA
-                    25,                   # PEDIATRIA (valor ejemplo)
-                    datos[0],             # CAMAS_UCI_OCUPADAS
-                    datos[1],             # CAMAS_UCI_TOTALES
-                    0,                    # ES_FESTIVO
-                    1 if datetime.now().weekday() >= 5 else 0  # ES_FIN_SEMANA
+                    total_pacientes,
+                    datos[2],
+                    25,
+                    datos[0],
+                    datos[1],
+                    0,
+                    1 if datetime.now().weekday() >= 5 else 0
                 ]
                 
                 prediccion = modelo.predict([datos_prediccion])
                 prediccion_24h = min(100, max(0, round(prediccion[0])))
-                print(f"🤖 Predicción ML: {prediccion_24h}%")
+                print(f"Predicción ML: {prediccion_24h}%")
                 
             except Exception as e:
-                print(f"❌ Error en predicción ML: {e}")
+                print(f"Error en predicción ML: {e}")
                 prediccion_24h = min(100, ocupacion_uci + 5)
         else:
             prediccion_24h = min(100, ocupacion_uci + 8)
@@ -138,17 +132,111 @@ def obtener_metricas_reales(hospital_id):
             'insumos_criticos': max(70, 100 - ocupacion_uci),
             'prediccion_24h': prediccion_24h,
             'evolucion_semanal': evolucion_semanal,
-            'ocupacion_areas': [ocupacion_uci, 65, 58]  # UCI, Urgencias, Hospitalización
+            'ocupacion_areas': [ocupacion_uci, 65, 58]
         }
         
-        print(f"📈 Métricas calculadas: UCI={ocupacion_uci}%, Predicción={prediccion_24h}%")
+        print(f"Métricas calculadas: UCI={ocupacion_uci}%, Predicción={prediccion_24h}%")
         return metricas
         
     except Exception as e:
-        print(f"❌ Error obteniendo métricas: {e}")
+        print(f"Error obteniendo métricas: {e}")
         return None
     finally:
-        conn.close()
+        if conn:
+            try:
+                conn.close()
+            except:
+                pass
+
+# Obtener ocupación de otros hospitales
+def obtener_ocupacion_otros_hospitales(hospital_actual_id):
+    conn = get_db_connection()
+    if not conn:
+        print("No se pudo conectar a BD para obtener datos de otros hospitales")
+        return []
+        
+    try:
+        cur = conn.cursor()
+        
+        cur.execute("""
+            SELECT 
+                h.ID_HOSPITAL,
+                h.NOMBRE_HOSPITAL,
+                ch.CAMAS_UCI_OCUPADAS,
+                ch.CAMAS_UCI_TOTALES,
+                ch.FECHA
+            FROM HOSPITALES h
+            LEFT JOIN CAPACIDAD_HOSPITAL ch ON h.ID_HOSPITAL = ch.ID_HOSPITAL
+            WHERE h.ID_HOSPITAL != ?
+            AND ch.FECHA = (
+                SELECT MAX(FECHA) 
+                FROM CAPACIDAD_HOSPITAL 
+                WHERE ID_HOSPITAL = h.ID_HOSPITAL
+            )
+            ORDER BY h.ID_HOSPITAL
+        """, (hospital_actual_id,))
+        
+        resultados = cur.fetchall()
+        otros_hospitales = []
+        
+        for hospital in resultados:
+            id_hospital, nombre, uci_ocupadas, uci_totales, fecha = hospital
+            
+            if uci_totales and uci_totales > 0:
+                ocupacion_porcentaje = round((uci_ocupadas / uci_totales) * 100)
+            else:
+                ocupacion_porcentaje = 0
+                
+            otros_hospitales.append({
+                'id': id_hospital,
+                'nombre': nombre,
+                'ocupacion_uci': ocupacion_porcentaje,
+                'uci_ocupadas': uci_ocupadas,
+                'uci_totales': uci_totales,
+                'fecha_actualizacion': fecha
+            })
+        
+        print(f"Datos obtenidos para {len(otros_hospitales)} otros hospitales")
+        return otros_hospitales
+        
+    except Exception as e:
+        print(f"Error obteniendo datos de otros hospitales: {e}")
+        return []
+    finally:
+        if conn:
+            try:
+                conn.close()
+            except:
+                pass
+
+# Obtener predicciones de otros hospitales
+def obtener_predicciones_otros_hospitales(hospital_actual_id):
+    otros_hospitales = obtener_ocupacion_otros_hospitales(hospital_actual_id)
+    
+    if not otros_hospitales:
+        print("Usando datos de ejemplo para predicciones de otros hospitales")
+        todos_hospitales = [
+            {'id': 1, 'nombre': 'Hospital Regional Manuel Nunez Butron', 'ocupacion_uci': 65},
+            {'id': 2, 'nombre': 'Hospital Carlos Monge Medrano', 'ocupacion_uci': 45},
+            {'id': 3, 'nombre': 'Hospital de Apoyo Ilave', 'ocupacion_uci': 40},
+            {'id': 4, 'nombre': 'Hospital de Apoyo Ayaviri', 'ocupacion_uci': 35},
+            {'id': 5, 'nombre': 'Hospital Regional Honorio Delgado', 'ocupacion_uci': 85}
+        ]
+        otros_hospitales = [h for h in todos_hospitales if h['id'] != hospital_actual_id]
+    
+    for hospital in otros_hospitales:
+        ocupacion_actual = hospital['ocupacion_uci']
+        
+        if ocupacion_actual >= 80:
+            prediccion = min(100, ocupacion_actual + 5)
+        elif ocupacion_actual >= 60:
+            prediccion = min(100, ocupacion_actual + 3)
+        else:
+            prediccion = min(100, ocupacion_actual + 2)
+        
+        hospital['prediccion_24h'] = prediccion
+    
+    return otros_hospitales
 
 # Middleware para verificar login
 def login_required(f):
@@ -167,7 +255,7 @@ def login():
         id_hospital = request.form.get('id_hospital')
         password = request.form.get('password')
         
-        print(f"🔐 Intento de login: ID={id_hospital}")
+        print(f"Intento de login: ID={id_hospital}")
         
         conn = get_db_connection()
         if conn:
@@ -175,7 +263,7 @@ def login():
                 cur = conn.cursor()
                 
                 cur.execute(
-                    "SELECT ID_HOSPITAL FROM HOSPITALES WHERE ID_HOSPITAL = ? AND PASSWORD = ?", 
+                    "SELECT ID_HOSPITAL FROM HOSPITALES WHERE ID_HOSPITAL = ? AND PASSWORD = ?",
                     (id_hospital, password)
                 )
                 resultado = cur.fetchone()
@@ -183,7 +271,6 @@ def login():
                 if resultado:
                     hospital_id = resultado[0]
                     
-                    # Obtener nombre del hospital
                     hospital_nombre = f"Hospital {hospital_id}"
                     try:
                         cur.execute("SELECT NOMBRE_HOSPITAL FROM HOSPITALES WHERE ID_HOSPITAL = ?", (hospital_id,))
@@ -191,21 +278,21 @@ def login():
                         if nombre_result:
                             hospital_nombre = nombre_result[0]
                     except Exception as nombre_error:
-                        print(f"⚠️  Error obteniendo nombre: {nombre_error}")
+                        print(f"Error obteniendo nombre: {nombre_error}")
                     
                     session['hospital_id'] = hospital_id
                     session['hospital_nombre'] = hospital_nombre
                     session['logged_in'] = True
                     conn.close()
-                    print(f"✅ Login exitoso: {hospital_nombre}")
+                    print(f"Login exitoso: {hospital_nombre}")
                     return redirect(url_for('dashboard'))
                 else:
                     flash('ID de hospital o contraseña incorrectos', 'error')
-                    print("❌ Login fallido: credenciales incorrectas")
+                    print("Login fallido: credenciales incorrectas")
                     
             except Exception as e:
                 flash('Error en el sistema de autenticación', 'error')
-                print(f"❌ Error en login: {e}")
+                print(f"Error en login: {e}")
             finally:
                 try:
                     conn.close()
@@ -213,7 +300,7 @@ def login():
                     pass
         else:
             flash('Error conectando a la base de datos', 'error')
-            print("❌ No se pudo conectar a la BD")
+            print("No se pudo conectar a la BD")
     
     return render_template('login.html')
 
@@ -223,19 +310,17 @@ def logout():
     session.clear()
     return redirect(url_for('login'))
 
-# Dashboard principal CON DATOS REALES
+# Dashboard principal
 @app.route('/dashboard')
 @login_required
 def dashboard():
     hospital_id = session['hospital_id']
     
-    print(f"📊 Obteniendo métricas REALES para hospital {hospital_id}")
+    print(f"Obteniendo métricas REALES para hospital {hospital_id}")
     
-    # Obtener métricas REALES desde BD
     metricas = obtener_metricas_reales(hospital_id)
     
     if not metricas:
-        # Fallback si hay error
         metricas = {
             'ocupacion_uci': 76,
             'pacientes_urgencias': 142,
@@ -245,16 +330,28 @@ def dashboard():
             'ocupacion_areas': [76, 65, 58]
         }
         flash('Usando datos de demostración - Verifique conexión a BD', 'warning')
-        print("⚠️  Usando datos de demostración")
+        print("Usando datos de demostración")
     else:
-        print("✅ Mostrando datos REALES de BD")
+        print("Mostrando datos REALES de BD")
     
-    # Alertas basadas en métricas reales
+    otros_hospitales = obtener_ocupacion_otros_hospitales(hospital_id)
+    
+    if not otros_hospitales:
+        todos_hospitales = [
+            {'id': 1, 'nombre': 'Hospital Regional Manuel Nunez Butron', 'ocupacion_uci': 65},
+            {'id': 2, 'nombre': 'Hospital Carlos Monge Medrano', 'ocupacion_uci': 45},
+            {'id': 3, 'nombre': 'Hospital de Apoyo Ilave', 'ocupacion_uci': 40},
+            {'id': 4, 'nombre': 'Hospital de Apoyo Ayaviri', 'ocupacion_uci': 35},
+            {'id': 5, 'nombre': 'Hospital Regional Honorio Delgado', 'ocupacion_uci': 85}
+        ]
+        otros_hospitales = [h for h in todos_hospitales if h['id'] != hospital_id]
+        print("Usando datos de ejemplo para otros hospitales")
+    
     alertas = []
     if metricas['ocupacion_uci'] >= 80:
-        alertas.append({'mensaje': f'UCI al {metricas["ocupacion_uci"]}% - ALTA OCUPACIÓN', 'tiempo': 'Actual', 'nivel_urgencia': 'ALTO'})
+        alertas.append({'mensaje': f'UCI al {metricas["ocupacion_uci"]}% - ALTA OCUPACION', 'tiempo': 'Actual', 'nivel_urgencia': 'ALTO'})
     if metricas['insumos_criticos'] >= 80:
-        alertas.append({'mensaje': 'Insumos críticos bajos', 'tiempo': 'Hace 1 hora', 'nivel_urgencia': 'MEDIO'})
+        alertas.append({'mensaje': 'Insumos criticos bajos', 'tiempo': 'Hace 1 hora', 'nivel_urgencia': 'MEDIO'})
     
     if not alertas:
         alertas.append({'mensaje': 'Sistema operando normalmente', 'tiempo': 'Actual', 'nivel_urgencia': 'BAJO'})
@@ -263,28 +360,26 @@ def dashboard():
                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
                          metricas=metricas,
-                         alertas=alertas)
+                         alertas=alertas,
+                         otros_hospitales=otros_hospitales)
 
-# Predicciones CON DATOS REALES
+# Ruta de predicciones CORREGIDA
 @app.route('/predictions')
 @login_required  
 def predictions():
     hospital_id = session['hospital_id']
     
-    print(f"🤖 Obteniendo predicciones para hospital {hospital_id}")
+    print(f"Obteniendo predicciones para hospital {hospital_id}")
     
-    # Obtener métricas REALES para predicciones
     metricas = obtener_metricas_reales(hospital_id)
     
     if not metricas:
-        # Fallback
         metricas = {
             'ocupacion_uci': 76,
             'prediccion_24h': 92
         }
-        print("⚠️  Usando datos de demostración para predicciones")
+        print("Usando datos de demostración para predicciones")
     
-    # Determinar nivel de riesgo
     if metricas['prediccion_24h'] >= 80:
         nivel_riesgo = 'Crítico'
     elif metricas['prediccion_24h'] >= 60:
@@ -292,22 +387,32 @@ def predictions():
     else:
         nivel_riesgo = 'Bajo'
     
+    # OBTENER DATOS REALES DE OTROS HOSPITALES CON PREDICCIONES
+    otros_hospitales_reales = obtener_predicciones_otros_hospitales(hospital_id)
+    
+    for hospital in otros_hospitales_reales:
+        if hospital['prediccion_24h'] >= 80:
+            hospital['nivel_riesgo'] = 'Alto'
+        elif hospital['prediccion_24h'] >= 60:
+            hospital['nivel_riesgo'] = 'Moderado'
+        else:
+            hospital['nivel_riesgo'] = 'Bajo'
+    
     predicciones_principal = {
         'prediccion_modelo': metricas['prediccion_24h'],
         'tendencia': 'aumento' if metricas['prediccion_24h'] > metricas['ocupacion_uci'] else 'estable',
-        'hospitales_riesgo': 2,
+        'hospitales_riesgo': len([h for h in otros_hospitales_reales if h['nivel_riesgo'] == 'Alto']),
         'ocupacion_actual': metricas['ocupacion_uci'],
         'prediccion_24h': metricas['prediccion_24h'],
         'prediccion_48h': min(100, metricas['prediccion_24h'] + 3),
         'nivel_riesgo': nivel_riesgo
     }
     
-    # Datos para gráficas basados en datos reales
     datos_grafica_prediccion = {
         'labels': ["0h", "6h", "12h", "18h", "24h", "30h", "36h", "42h", "48h"],
         'actual': [
             max(0, metricas['ocupacion_uci'] - 10),
-            max(0, metricas['ocupacion_uci'] - 5), 
+            max(0, metricas['ocupacion_uci'] - 5),
             metricas['ocupacion_uci'],
             min(100, metricas['ocupacion_uci'] + 2),
             min(100, metricas['ocupacion_uci'] + 5),
@@ -323,41 +428,26 @@ def predictions():
         ]
     }
     
-    # Datos comparativa (simplificado)
-    datos_comparativa = {
-        'labels': [session['hospital_nombre'], "Hospital 2", "Hospital 3", "Hospital 4", "Hospital 5"],
-        'actual': [
-            metricas['ocupacion_uci'],
-            metricas['ocupacion_uci'] - 15,
-            metricas['ocupacion_uci'] - 25, 
-            metricas['ocupacion_uci'] - 30,
-            metricas['ocupacion_uci'] + 10
-        ],
-        'prediccion_24h': [
-            metricas['prediccion_24h'],
-            metricas['prediccion_24h'] - 10,
-            metricas['prediccion_24h'] - 20,
-            metricas['prediccion_24h'] - 25,
-            metricas['prediccion_24h'] + 5
-        ]
-    }
+    # ✅ CORRECCIÓN: Gráfica comparativa solo muestra otros hospitales (excluyendo el actual)
+    nombres_hospitales = [h['nombre'] for h in otros_hospitales_reales]
+    ocupacion_actual = [h['ocupacion_uci'] for h in otros_hospitales_reales]
+    prediccion_24h = [h['prediccion_24h'] for h in otros_hospitales_reales]
     
-    otros_hospitales = [
-        {'id': 2, 'nombre': 'Hospital Juliaca', 'prediccion_24h': datos_comparativa['prediccion_24h'][1], 'nivel_riesgo': 'Moderado'},
-        {'id': 3, 'nombre': 'Hospital Ilave', 'prediccion_24h': datos_comparativa['prediccion_24h'][2], 'nivel_riesgo': 'Bajo'},
-        {'id': 4, 'nombre': 'Hospital Ayaviri', 'prediccion_24h': datos_comparativa['prediccion_24h'][3], 'nivel_riesgo': 'Bajo'},
-        {'id': 5, 'nombre': 'Hospital Arequipa', 'prediccion_24h': datos_comparativa['prediccion_24h'][4], 'nivel_riesgo': 'Alto'}
-    ]
+    datos_comparativa = {
+        'labels': nombres_hospitales,
+        'actual': ocupacion_actual,
+        'prediccion_24h': prediccion_24h
+    }
     
     return render_template('predictions.html',
                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
                          predicciones=predicciones_principal,
-                         otros_hospitales=otros_hospitales,
+                         otros_hospitales=otros_hospitales_reales,
                          datos_grafica_prediccion=datos_grafica_prediccion,
                          datos_comparativa=datos_comparativa)
 
-# ✅ NUEVA RUTA: Formulario de ingreso de datos
+# Las demás rutas permanecen igual...
 @app.route('/formulario_datos')
 @login_required
 def formulario_datos():
@@ -366,14 +456,12 @@ def formulario_datos():
                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
                          fecha_hoy=datetime.now().strftime("%Y-%m-%d"))
 
-# ✅ NUEVA RUTA: Guardar datos en BD
 @app.route('/guardar_datos', methods=['POST'])
 @login_required
 def guardar_datos():
     hospital_id = session['hospital_id']
     
     try:
-        # Obtener datos del formulario
         fecha = request.form.get('fecha')
         total_pacientes = request.form.get('total_pacientes')
         emergencia = request.form.get('emergencia')
@@ -405,17 +493,15 @@ def guardar_datos():
         if conn:
             cur = conn.cursor()
             
-            # 1. Insertar en ASISTENCIA_DIARIA
             cur.execute("""
-                INSERT INTO ASISTENCIA_DIARIA 
+                INSERT INTO ASISTENCIA_DIARIA
                 (FECHA, ID_HOSPITAL, TOTAL_PACIENTES, EMERGENCIA, PEDIATRIA, MEDICINA_INTERNA, CIRUGIA_GENERAL, GINECOLOGIA)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?)
             """, (fecha, hospital_id, total_pacientes, emergencia, pediatria, medicina_interna, cirugia_general, ginecologia))
             
-            # 2. Insertar en CAPACIDAD_HOSPITAL
             cur.execute("""
-                INSERT INTO CAPACIDAD_HOSPITAL 
-                (FECHA, ID_HOSPITAL, CAMAS_UCI_TOTALES, CAMAS_UCI_OCUPADAS, CAMAS_EMERGENCIA_TOTALES, 
+                INSERT INTO CAPACIDAD_HOSPITAL
+                (FECHA, ID_HOSPITAL, CAMAS_UCI_TOTALES, CAMAS_UCI_OCUPADAS, CAMAS_EMERGENCIA_TOTALES,
                  CAMAS_EMERGENCIA_OCUPADAS, CAMAS_HOSPITALIZACION_TOTALES, CAMAS_HOSPITALIZACION_OCUPADAS,
                  PACIENTES_ESPERA, TIEMPO_ESPERA_PROMEDIO)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -423,26 +509,24 @@ def guardar_datos():
                  camas_emergencia_ocupadas, camas_hospitalizacion_totales, camas_hospitalizacion_ocupadas,
                  pacientes_espera, tiempo_espera_promedio))
             
-            # 3. Insertar en PERSONAL_MEDICO
             total_doctores = int(emergencia_doctores) + int(pediatria_doctores) + int(medicina_doctores)
             total_enfermeras = int(emergencia_enfermeras) + int(pediatria_enfermeras) + int(medicina_enfermeras)
             
             cur.execute("""
-                INSERT INTO PERSONAL_MEDICO 
-                (FECHA, ID_HOSPITAL, EMERGENCIA_DOCTORES, EMERGENCIA_ENFERMERAS, 
+                INSERT INTO PERSONAL_MEDICO
+                (FECHA, ID_HOSPITAL, EMERGENCIA_DOCTORES, EMERGENCIA_ENFERMERAS,
                  PEDIATRIA_DOCTORES, PEDIATRIA_ENFERMERAS, MEDICINA_INTERNA_DOCTORES, MEDICINA_INTERNA_ENFERMERAS,
                  TOTAL_DOCTORES, TOTAL_ENFERMERAS)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (fecha, hospital_id, emergencia_doctores, emergencia_enfermeras, 
+            """, (fecha, hospital_id, emergencia_doctores, emergencia_enfermeras,
                  pediatria_doctores, pediatria_enfermeras, medicina_doctores, medicina_enfermeras,
                  total_doctores, total_enfermeras))
             
-            # 4. Insertar en FACTORES_EXTERNOS
             es_fin_semana = 1 if datetime.strptime(fecha, '%Y-%m-%d').weekday() >= 5 else 0
             dia_semana = datetime.strptime(fecha, '%Y-%m-%d').strftime('%A')
             
             cur.execute("""
-                INSERT INTO FACTORES_EXTERNOS 
+                INSERT INTO FACTORES_EXTERNOS
                 (FECHA, ID_HOSPITAL, ES_FESTIVO, NOMBRE_FESTIVO, ES_FIN_SEMANA, DIA_SEMANA)
                 VALUES (?, ?, ?, ?, ?, ?)
             """, (fecha, hospital_id, es_festivo, nombre_festivo, es_fin_semana, dia_semana))
@@ -450,19 +534,18 @@ def guardar_datos():
             conn.commit()
             conn.close()
             
-            flash('✅ Datos guardados exitosamente', 'success')
-            print(f"✅ Datos guardados para hospital {hospital_id}, fecha {fecha}")
+            flash('Datos guardados exitosamente', 'success')
+            print(f"Datos guardados para hospital {hospital_id}, fecha {fecha}")
             
         else:
-            flash('❌ Error conectando a la base de datos', 'error')
+            flash('Error conectando a la base de datos', 'error')
             
     except Exception as e:
-        flash(f'❌ Error guardando datos: {str(e)}', 'error')
-        print(f"❌ Error guardando datos: {e}")
+        flash(f'Error guardando datos: {str(e)}', 'error')
+        print(f"Error guardando datos: {e}")
     
     return redirect(url_for('formulario_datos'))
 
-# Gestión Operativa
 @app.route('/gestion_operativa')
 @login_required
 def gestion_operativa():
@@ -470,7 +553,6 @@ def gestion_operativa():
                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"))
 
-# Acerca de
 @app.route('/acerca_de')
 @login_required
 def acerca_de():
