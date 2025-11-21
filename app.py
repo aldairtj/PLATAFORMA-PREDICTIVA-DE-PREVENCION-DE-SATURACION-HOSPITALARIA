@@ -159,7 +159,7 @@ def obtener_ocupacion_otros_hospitales(hospital_actual_id):
         cur = conn.cursor()
         
         cur.execute("""
-            SELECT 
+            SELECT
                 h.ID_HOSPITAL,
                 h.NOMBRE_HOSPITAL,
                 ch.CAMAS_UCI_OCUPADAS,
@@ -169,8 +169,8 @@ def obtener_ocupacion_otros_hospitales(hospital_actual_id):
             LEFT JOIN CAPACIDAD_HOSPITAL ch ON h.ID_HOSPITAL = ch.ID_HOSPITAL
             WHERE h.ID_HOSPITAL != ?
             AND ch.FECHA = (
-                SELECT MAX(FECHA) 
-                FROM CAPACIDAD_HOSPITAL 
+                SELECT MAX(FECHA)
+                FROM CAPACIDAD_HOSPITAL
                 WHERE ID_HOSPITAL = h.ID_HOSPITAL
             )
             ORDER BY h.ID_HOSPITAL
@@ -357,11 +357,11 @@ def dashboard():
         alertas.append({'mensaje': 'Sistema operando normalmente', 'tiempo': 'Actual', 'nivel_urgencia': 'BAJO'})
     
     return render_template('index.html',
-                         hospital_nombre=session.get('hospital_nombre', 'Hospital'),
-                         fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
-                         metricas=metricas,
-                         alertas=alertas,
-                         otros_hospitales=otros_hospitales)
+                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
+                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
+                          metricas=metricas,
+                          alertas=alertas,
+                          otros_hospitales=otros_hospitales)
 
 # Ruta de predicciones CORREGIDA
 @app.route('/predictions')
@@ -428,7 +428,7 @@ def predictions():
         ]
     }
     
-    # ✅ CORRECCIÓN: Gráfica comparativa solo muestra otros hospitales (excluyendo el actual)
+    # CORRECCIÓN: Gráfica comparativa solo muestra otros hospitales (excluyendo el actual)
     nombres_hospitales = [h['nombre'] for h in otros_hospitales_reales]
     ocupacion_actual = [h['ocupacion_uci'] for h in otros_hospitales_reales]
     prediccion_24h = [h['prediccion_24h'] for h in otros_hospitales_reales]
@@ -440,21 +440,20 @@ def predictions():
     }
     
     return render_template('predictions.html',
-                         hospital_nombre=session.get('hospital_nombre', 'Hospital'),
-                         fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
-                         predicciones=predicciones_principal,
-                         otros_hospitales=otros_hospitales_reales,
-                         datos_grafica_prediccion=datos_grafica_prediccion,
-                         datos_comparativa=datos_comparativa)
+                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
+                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
+                          predicciones=predicciones_principal,
+                          otros_hospitales=otros_hospitales_reales,
+                          datos_grafica_prediccion=datos_grafica_prediccion,
+                          datos_comparativa=datos_comparativa)
 
-# Las demás rutas permanecen igual...
 @app.route('/formulario_datos')
 @login_required
 def formulario_datos():
     return render_template('formulario_datos.html',
-                         hospital_nombre=session.get('hospital_nombre', 'Hospital'),
-                         fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
-                         fecha_hoy=datetime.now().strftime("%Y-%m-%d"))
+                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
+                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"),
+                          fecha_hoy=datetime.now().strftime("%Y-%m-%d"))
 
 @app.route('/guardar_datos', methods=['POST'])
 @login_required
@@ -469,6 +468,13 @@ def guardar_datos():
         medicina_interna = request.form.get('medicina_interna')
         cirugia_general = request.form.get('cirugia_general')
         ginecologia = request.form.get('ginecologia')
+        
+        # NUEVOS CAMPOS PARA ASISTENCIA_DIARIA
+        traumatologia = request.form.get('traumatologia', 0)
+        cardiologia = request.form.get('cardiologia', 0)
+        neurologia = request.form.get('neurologia', 0)
+        oncologia = request.form.get('oncologia', 0)
+        dermatologia = request.form.get('dermatologia', 0)
         
         camas_uci_totales = request.form.get('camas_uci_totales')
         camas_uci_ocupadas = request.form.get('camas_uci_ocupadas')
@@ -486,19 +492,30 @@ def guardar_datos():
         medicina_doctores = request.form.get('medicina_doctores')
         medicina_enfermeras = request.form.get('medicina_enfermeras')
         
+        # NUEVOS CAMPOS PARA PERSONAL_MEDICO
+        cirugia_doctores = request.form.get('cirugia_doctores', 0)
+        cirugia_enfermeras = request.form.get('cirugia_enfermeras', 0)
+        ginecologia_doctores = request.form.get('ginecologia_doctores', 0)
+        ginecologia_enfermeras = request.form.get('ginecologia_enfermeras', 0)
+        
         es_festivo = request.form.get('es_festivo', 0)
         nombre_festivo = request.form.get('nombre_festivo', '')
+        temporada_especial = request.form.get('temporada_especial', '')
         
         conn = get_db_connection()
         if conn:
             cur = conn.cursor()
             
+            # ASISTENCIA_DIARIA - COMPLETO
             cur.execute("""
                 INSERT INTO ASISTENCIA_DIARIA
-                (FECHA, ID_HOSPITAL, TOTAL_PACIENTES, EMERGENCIA, PEDIATRIA, MEDICINA_INTERNA, CIRUGIA_GENERAL, GINECOLOGIA)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-            """, (fecha, hospital_id, total_pacientes, emergencia, pediatria, medicina_interna, cirugia_general, ginecologia))
+                (FECHA, ID_HOSPITAL, TOTAL_PACIENTES, EMERGENCIA, PEDIATRIA, MEDICINA_INTERNA, 
+                 CIRUGIA_GENERAL, GINECOLOGIA, TRAUMATOLOGIA, CARDIOLOGIA, NEUROLOGIA, ONCOLOGIA, DERMATOLOGIA)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (fecha, hospital_id, total_pacientes, emergencia, pediatria, medicina_interna, 
+                  cirugia_general, ginecologia, traumatologia, cardiologia, neurologia, oncologia, dermatologia))
             
+            # CAPACIDAD_HOSPITAL - COMPLETO
             cur.execute("""
                 INSERT INTO CAPACIDAD_HOSPITAL
                 (FECHA, ID_HOSPITAL, CAMAS_UCI_TOTALES, CAMAS_UCI_OCUPADAS, CAMAS_EMERGENCIA_TOTALES,
@@ -509,27 +526,31 @@ def guardar_datos():
                  camas_emergencia_ocupadas, camas_hospitalizacion_totales, camas_hospitalizacion_ocupadas,
                  pacientes_espera, tiempo_espera_promedio))
             
-            total_doctores = int(emergencia_doctores) + int(pediatria_doctores) + int(medicina_doctores)
-            total_enfermeras = int(emergencia_enfermeras) + int(pediatria_enfermeras) + int(medicina_enfermeras)
+            # PERSONAL_MEDICO - COMPLETO
+            total_doctores = int(emergencia_doctores) + int(pediatria_doctores) + int(medicina_doctores) + int(cirugia_doctores) + int(ginecologia_doctores)
+            total_enfermeras = int(emergencia_enfermeras) + int(pediatria_enfermeras) + int(medicina_enfermeras) + int(cirugia_enfermeras) + int(ginecologia_enfermeras)
             
             cur.execute("""
                 INSERT INTO PERSONAL_MEDICO
                 (FECHA, ID_HOSPITAL, EMERGENCIA_DOCTORES, EMERGENCIA_ENFERMERAS,
                  PEDIATRIA_DOCTORES, PEDIATRIA_ENFERMERAS, MEDICINA_INTERNA_DOCTORES, MEDICINA_INTERNA_ENFERMERAS,
+                 CIRUGIA_DOCTORES, CIRUGIA_ENFERMERAS, GINECOLOGIA_DOCTORES, GINECOLOGIA_ENFERMERAS,
                  TOTAL_DOCTORES, TOTAL_ENFERMERAS)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (fecha, hospital_id, emergencia_doctores, emergencia_enfermeras,
                  pediatria_doctores, pediatria_enfermeras, medicina_doctores, medicina_enfermeras,
+                 cirugia_doctores, cirugia_enfermeras, ginecologia_doctores, ginecologia_enfermeras,
                  total_doctores, total_enfermeras))
             
-            es_fin_semana = 1 if datetime.strptime(fecha, '%Y-%m-%d').weekday() >= 5 else 0
+            # FACTORES_EXTERNOS - COMPLETO
+            es_fin_semana = datetime.strptime(fecha, '%Y-%m-%d').weekday() >= 5
             dia_semana = datetime.strptime(fecha, '%Y-%m-%d').strftime('%A')
             
             cur.execute("""
                 INSERT INTO FACTORES_EXTERNOS
-                (FECHA, ID_HOSPITAL, ES_FESTIVO, NOMBRE_FESTIVO, ES_FIN_SEMANA, DIA_SEMANA)
-                VALUES (?, ?, ?, ?, ?, ?)
-            """, (fecha, hospital_id, es_festivo, nombre_festivo, es_fin_semana, dia_semana))
+                (FECHA, ID_HOSPITAL, ES_FESTIVO, NOMBRE_FESTIVO, ES_FIN_SEMANA, DIA_SEMANA, TEMPORADA_ESPECIAL)
+                VALUES (?, ?, ?, ?, ?, ?, ?)
+            """, (fecha, hospital_id, es_festivo, nombre_festivo, es_fin_semana, dia_semana, temporada_especial))
             
             conn.commit()
             conn.close()
@@ -550,15 +571,15 @@ def guardar_datos():
 @login_required
 def gestion_operativa():
     return render_template('gestion_operativa.html',
-                         hospital_nombre=session.get('hospital_nombre', 'Hospital'),
-                         fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"))
+                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
+                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"))
 
 @app.route('/acerca_de')
 @login_required
 def acerca_de():
     return render_template('acerca_de.html',
-                         hospital_nombre=session.get('hospital_nombre', 'Hospital'),
-                         fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"))
+                          hospital_nombre=session.get('hospital_nombre', 'Hospital'),
+                          fecha_actual=datetime.now().strftime("%A, %d de %B de %Y"))
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

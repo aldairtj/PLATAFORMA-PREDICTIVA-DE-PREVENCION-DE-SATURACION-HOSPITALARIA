@@ -42,7 +42,6 @@
                 <span>Configuración</span>
             </div>
         </aside>
-
         <main class="main-content">
             <header class="top-header">
                 <div class="date-info">
@@ -58,7 +57,6 @@
                     <i class="fas fa-user-circle"></i>
                 </div>
             </header>
-
             <section class="dashboard-body">
                 <h1 class="section-title">Ingreso de Datos Diarios</h1>
                 <p class="subtitle">Complete la información del día - {{ hospital_nombre }}</p>
@@ -72,7 +70,6 @@
                         </div>
                     {% endif %}
                 {% endwith %}
-
                 <div class="form-container">
                     <form action="{{ url_for('guardar_datos') }}" method="POST" class="data-form">
                         
@@ -99,9 +96,15 @@
                                     <input type="text" name="nombre_festivo" id="nombre_festivo" placeholder="Ej: Año Nuevo" class="form-input">
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label for="temporada_especial">Temporada Especial</label>
+                                <input type="text" name="temporada_especial" id="temporada_especial" 
+                                    placeholder="Ej: Candelaria, Carnavales, Fiestas Patrias, Verano, etc." 
+                                    class="form-input">
+                            </div>
                         </div>
 
-                        <!-- Sección 2: Asistencia Diaria -->
+                        <!-- Sección 2: Asistencia Diaria COMPLETA -->
                         <div class="form-section-card">
                             <div class="form-section-header">
                                 <i class="fas fa-procedures icon-green"></i>
@@ -131,6 +134,27 @@
                                 <div class="form-group">
                                     <label for="ginecologia">Ginecología *</label>
                                     <input type="number" name="ginecologia" id="ginecologia" min="0" required class="form-input">
+                                </div>
+                                <!-- NUEVOS CAMPOS PARA ASISTENCIA_DIARIA -->
+                                <div class="form-group">
+                                    <label for="traumatologia">Traumatología *</label>
+                                    <input type="number" name="traumatologia" id="traumatologia" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cardiologia">Cardiología *</label>
+                                    <input type="number" name="cardiologia" id="cardiologia" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="neurologia">Neurología *</label>
+                                    <input type="number" name="neurologia" id="neurologia" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="oncologia">Oncología *</label>
+                                    <input type="number" name="oncologia" id="oncologia" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="dermatologia">Dermatología *</label>
+                                    <input type="number" name="dermatologia" id="dermatologia" min="0" required class="form-input">
                                 </div>
                             </div>
                         </div>
@@ -177,7 +201,7 @@
                             </div>
                         </div>
 
-                        <!-- Sección 4: Personal Médico -->
+                        <!-- Sección 4: Personal Médico COMPLETO -->
                         <div class="form-section-card">
                             <div class="form-section-header">
                                 <i class="fas fa-user-md icon-orange"></i>
@@ -208,6 +232,23 @@
                                     <label for="medicina_enfermeras">Enfermeras Medicina Interna *</label>
                                     <input type="number" name="medicina_enfermeras" id="medicina_enfermeras" min="0" required class="form-input">
                                 </div>
+                                <!-- NUEVOS CAMPOS PARA PERSONAL_MEDICO -->
+                                <div class="form-group">
+                                    <label for="cirugia_doctores">Doctores Cirugía General *</label>
+                                    <input type="number" name="cirugia_doctores" id="cirugia_doctores" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="cirugia_enfermeras">Enfermeras Cirugía General *</label>
+                                    <input type="number" name="cirugia_enfermeras" id="cirugia_enfermeras" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ginecologia_doctores">Doctores Ginecología *</label>
+                                    <input type="number" name="ginecologia_doctores" id="ginecologia_doctores" min="0" required class="form-input">
+                                </div>
+                                <div class="form-group">
+                                    <label for="ginecologia_enfermeras">Enfermeras Ginecología *</label>
+                                    <input type="number" name="ginecologia_enfermeras" id="ginecologia_enfermeras" min="0" required class="form-input">
+                                </div>
                             </div>
                         </div>
 
@@ -225,7 +266,6 @@
             </section>
         </main>
     </div>
-
     <script>
         // Establecer fecha actual por defecto
         document.addEventListener('DOMContentLoaded', function() {
